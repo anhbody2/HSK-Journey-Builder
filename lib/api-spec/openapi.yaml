@@ -1,22 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: HSK Smart Learning API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User management
+  - name: lessons
+    description: Lesson content
+  - name: progress
+    description: Learning progress
+  - name: quiz
+    description: Quiz and assessments
+  - name: shadowing
+    description: Shadowing exercise scoring
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,254 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users/profile:
+    get:
+      operationId: getProfile
+      tags: [users]
+      summary: Get user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    put:
+      operationId: updateProfile
+      tags: [users]
+      summary: Update user profile and HSK goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileInput"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/onboarding:
+    post:
+      operationId: completeOnboarding
+      tags: [users]
+      summary: Complete onboarding with placement result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnboardingInput"
+      responses:
+        "200":
+          description: Onboarding completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /lessons:
+    get:
+      operationId: getLessons
+      tags: [lessons]
+      summary: Get lessons for a HSK level
+      parameters:
+        - in: query
+          name: level
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: unit
+          schema:
+            type: integer
+          required: false
+      responses:
+        "200":
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+
+  /lessons/{id}:
+    get:
+      operationId: getLesson
+      tags: [lessons]
+      summary: Get lesson detail with dialogue, vocabulary, grammar
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lesson detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonDetail"
+
+  /lessons/daily:
+    get:
+      operationId: getDailyTasks
+      tags: [lessons]
+      summary: Get today's AI-generated daily tasks
+      responses:
+        "200":
+          description: Daily learning tasks
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyPlan"
+
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [progress]
+      summary: Get overall learning progress summary
+      responses:
+        "200":
+          description: Progress summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressSummary"
+
+  /progress/lessons/{lessonId}:
+    post:
+      operationId: updateLessonProgress
+      tags: [progress]
+      summary: Record progress for a lesson step
+      parameters:
+        - in: path
+          name: lessonId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonProgressInput"
+      responses:
+        "200":
+          description: Updated lesson progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonProgress"
+
+  /progress/streak:
+    get:
+      operationId: getStreak
+      tags: [progress]
+      summary: Get user's learning streak and stats
+      responses:
+        "200":
+          description: Streak data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakData"
+
+  /shadowing/score:
+    post:
+      operationId: scoreShadowing
+      tags: [shadowing]
+      summary: Submit shadowing recording and get AI score with syllable feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShadowingInput"
+      responses:
+        "200":
+          description: Shadowing score result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShadowingResult"
+
+  /quiz/generate:
+    post:
+      operationId: generateQuiz
+      tags: [quiz]
+      summary: Generate a mini-quiz for a lesson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizGenerateInput"
+      responses:
+        "200":
+          description: Generated quiz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quiz"
+
+  /quiz/submit:
+    post:
+      operationId: submitQuiz
+      tags: [quiz]
+      summary: Submit quiz answers and get results
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizSubmitInput"
+      responses:
+        "200":
+          description: Quiz result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizResult"
+
+  /quiz/checkpoint/{level}:
+    get:
+      operationId: getCheckpoint
+      tags: [quiz]
+      summary: Get HSK-format checkpoint exam for a level
+      parameters:
+        - in: path
+          name: level
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Checkpoint exam
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quiz"
+
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [progress]
+      summary: Get dashboard summary stats (XP, level progress, vocabulary count, completed lessons)
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +291,580 @@ components:
       required:
         - status
 
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        currentLevel:
+          type: integer
+        targetLevel:
+          type: integer
+        onboardingCompleted:
+          type: boolean
+        totalXp:
+          type: integer
+        dailyGoalMinutes:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - currentLevel
+        - targetLevel
+        - onboardingCompleted
+        - totalXp
+        - dailyGoalMinutes
+        - createdAt
+
+    UserProfileInput:
+      type: object
+      properties:
+        name:
+          type: string
+        targetLevel:
+          type: integer
+        dailyGoalMinutes:
+          type: integer
+
+    OnboardingInput:
+      type: object
+      properties:
+        name:
+          type: string
+        targetLevel:
+          type: integer
+        placementScore:
+          type: integer
+        recommendedLevel:
+          type: integer
+        dailyGoalMinutes:
+          type: integer
+      required:
+        - name
+        - targetLevel
+        - recommendedLevel
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+        level:
+          type: integer
+        unit:
+          type: integer
+        lessonNumber:
+          type: integer
+        title:
+          type: string
+        titleChinese:
+          type: string
+        type:
+          type: string
+          enum: [pinyin_basics, dialogue, vocabulary, grammar, review]
+        isLocked:
+          type: boolean
+        isCompleted:
+          type: boolean
+        xpReward:
+          type: integer
+        estimatedMinutes:
+          type: integer
+      required:
+        - id
+        - level
+        - unit
+        - lessonNumber
+        - title
+        - titleChinese
+        - type
+        - isLocked
+        - isCompleted
+        - xpReward
+        - estimatedMinutes
+
+    DialogueLine:
+      type: object
+      properties:
+        speaker:
+          type: string
+        chinese:
+          type: string
+        pinyin:
+          type: string
+        translation:
+          type: string
+      required:
+        - speaker
+        - chinese
+        - pinyin
+        - translation
+
+    VocabularyItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        chinese:
+          type: string
+        pinyin:
+          type: string
+        translation:
+          type: string
+        tone:
+          type: integer
+        strokeOrder:
+          type: ["string", "null"]
+        exampleSentence:
+          type: string
+        exampleTranslation:
+          type: string
+      required:
+        - id
+        - chinese
+        - pinyin
+        - translation
+        - tone
+        - exampleSentence
+        - exampleTranslation
+
+    GrammarPoint:
+      type: object
+      properties:
+        pattern:
+          type: string
+        explanation:
+          type: string
+        examples:
+          type: array
+          items:
+            type: object
+            properties:
+              chinese:
+                type: string
+              pinyin:
+                type: string
+              translation:
+                type: string
+            required:
+              - chinese
+              - pinyin
+              - translation
+      required:
+        - pattern
+        - explanation
+        - examples
+
+    LessonDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        level:
+          type: integer
+        unit:
+          type: integer
+        lessonNumber:
+          type: integer
+        title:
+          type: string
+        titleChinese:
+          type: string
+        type:
+          type: string
+        dialogue:
+          type: array
+          items:
+            $ref: "#/components/schemas/DialogueLine"
+        vocabulary:
+          type: array
+          items:
+            $ref: "#/components/schemas/VocabularyItem"
+        grammarPoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrammarPoint"
+        shadowingText:
+          type: string
+        shadowingPinyin:
+          type: string
+      required:
+        - id
+        - level
+        - unit
+        - lessonNumber
+        - title
+        - titleChinese
+        - type
+        - dialogue
+        - vocabulary
+        - grammarPoints
+        - shadowingText
+        - shadowingPinyin
+
+    DailyTask:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+        estimatedMinutes:
+          type: integer
+        isCompleted:
+          type: boolean
+        order:
+          type: integer
+      required:
+        - lessonId
+        - title
+        - type
+        - estimatedMinutes
+        - isCompleted
+        - order
+
+    DailyPlan:
+      type: object
+      properties:
+        date:
+          type: string
+        totalMinutes:
+          type: integer
+        completedMinutes:
+          type: integer
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyTask"
+        motivationMessage:
+          type: string
+      required:
+        - date
+        - totalMinutes
+        - completedMinutes
+        - tasks
+        - motivationMessage
+
+    LessonProgress:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+        step:
+          type: string
+          enum: [dialogue, vocabulary, shadowing, grammar, quiz]
+        isCompleted:
+          type: boolean
+        score:
+          type: ["integer", "null"]
+        completedAt:
+          type: ["string", "null"]
+      required:
+        - lessonId
+        - step
+        - isCompleted
+
+    LessonProgressInput:
+      type: object
+      properties:
+        step:
+          type: string
+          enum: [dialogue, vocabulary, shadowing, grammar, quiz]
+        isCompleted:
+          type: boolean
+        score:
+          type: ["integer", "null"]
+      required:
+        - step
+        - isCompleted
+
+    ProgressSummary:
+      type: object
+      properties:
+        currentLevel:
+          type: integer
+        currentUnit:
+          type: integer
+        completedLessons:
+          type: integer
+        totalLessons:
+          type: integer
+        levelProgressPercent:
+          type: integer
+        vocabularyLearned:
+          type: integer
+        totalXp:
+          type: integer
+        weeklyXp:
+          type: array
+          items:
+            type: object
+            properties:
+              day:
+                type: string
+              xp:
+                type: integer
+            required:
+              - day
+              - xp
+      required:
+        - currentLevel
+        - currentUnit
+        - completedLessons
+        - totalLessons
+        - levelProgressPercent
+        - vocabularyLearned
+        - totalXp
+        - weeklyXp
+
+    StreakData:
+      type: object
+      properties:
+        currentStreak:
+          type: integer
+        longestStreak:
+          type: integer
+        lastStudyDate:
+          type: ["string", "null"]
+        studiedToday:
+          type: boolean
+      required:
+        - currentStreak
+        - longestStreak
+        - studiedToday
+
+    ShadowingInput:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+        audioBase64:
+          type: string
+        targetText:
+          type: string
+        targetPinyin:
+          type: string
+      required:
+        - lessonId
+        - targetText
+        - targetPinyin
+
+    SyllableFeedback:
+      type: object
+      properties:
+        syllable:
+          type: string
+        pinyin:
+          type: string
+        score:
+          type: integer
+        color:
+          type: string
+          enum: [green, yellow, red]
+        errorType:
+          type: ["string", "null"]
+      required:
+        - syllable
+        - pinyin
+        - score
+        - color
+
+    ShadowingResult:
+      type: object
+      properties:
+        overallScore:
+          type: integer
+        syllableFeedback:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyllableFeedback"
+        tips:
+          type: array
+          items:
+            type: string
+        passed:
+          type: boolean
+      required:
+        - overallScore
+        - syllableFeedback
+        - tips
+        - passed
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [matching, pinyin_input, listening_choice, tone_selection, translation_choice]
+        question:
+          type: string
+        options:
+          type: ["array", "null"]
+          items:
+            type: string
+        correctAnswer:
+          type: string
+        audioText:
+          type: ["string", "null"]
+      required:
+        - id
+        - type
+        - question
+        - correctAnswer
+
+    Quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+        lessonId:
+          type: ["integer", "null"]
+          description: null for checkpoint exams
+        level:
+          type: integer
+        type:
+          type: string
+          enum: [mini_quiz, checkpoint]
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
+        totalQuestions:
+          type: integer
+        timeLimit:
+          type: ["integer", "null"]
+      required:
+        - id
+        - level
+        - type
+        - questions
+        - totalQuestions
+
+    QuizGenerateInput:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+        questionCount:
+          type: integer
+      required:
+        - lessonId
+
+    QuizSubmitInput:
+      type: object
+      properties:
+        quizId:
+          type: integer
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: integer
+              answer:
+                type: string
+            required:
+              - questionId
+              - answer
+      required:
+        - quizId
+        - answers
+
+    QuizResult:
+      type: object
+      properties:
+        quizId:
+          type: integer
+        score:
+          type: integer
+        correctCount:
+          type: integer
+        totalCount:
+          type: integer
+        passed:
+          type: boolean
+        xpEarned:
+          type: integer
+        questionResults:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: integer
+              isCorrect:
+                type: boolean
+              correctAnswer:
+                type: string
+              userAnswer:
+                type: string
+            required:
+              - questionId
+              - isCorrect
+              - correctAnswer
+              - userAnswer
+      required:
+        - quizId
+        - score
+        - correctCount
+        - totalCount
+        - passed
+        - xpEarned
+        - questionResults
+
+    DashboardStats:
+      type: object
+      properties:
+        totalXp:
+          type: integer
+        currentLevel:
+          type: integer
+        targetLevel:
+          type: integer
+        levelProgressPercent:
+          type: integer
+        vocabularyLearned:
+          type: integer
+        completedLessons:
+          type: integer
+        currentStreak:
+          type: integer
+        todayMinutes:
+          type: integer
+        dailyGoalMinutes:
+          type: integer
+        weeklyActivity:
+          type: array
+          items:
+            type: object
+            properties:
+              day:
+                type: string
+              xp:
+                type: integer
+              minutes:
+                type: integer
+            required:
+              - day
+              - xp
+              - minutes
+      required:
+        - totalXp
+        - currentLevel
+        - targetLevel
+        - levelProgressPercent
+        - vocabularyLearned
+        - completedLessons
+        - currentStreak
+        - todayMinutes
+        - dailyGoalMinutes
+        - weeklyActivity
