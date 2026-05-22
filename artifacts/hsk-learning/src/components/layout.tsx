@@ -61,30 +61,31 @@ export function AppLayout({
               "flex items-center border-b h-16 flex-shrink-0",
               collapsed ? "justify-center px-0" : "justify-between px-5",
             )}>
-              {!collapsed && (
-                <Link href="/dashboard" className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl flex-shrink-0">
-                    汉
-                  </div>
-                  <span className="font-bold text-lg tracking-tight whitespace-nowrap">HSK Smart</span>
-                </Link>
+              {collapsed ? (
+                /* When collapsed: logo acts as the expand toggle */
+                <button
+                  onClick={() => setCollapsed(false)}
+                  title="Mở rộng"
+                  className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl hover:opacity-80 transition-opacity"
+                >
+                  汉
+                </button>
+              ) : (
+                <>
+                  <Link href="/dashboard" className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl flex-shrink-0">
+                      汉
+                    </div>
+                    <span className="font-bold text-lg tracking-tight whitespace-nowrap">HSK Smart</span>
+                  </Link>
+                  <button
+                    onClick={() => setCollapsed(true)}
+                    className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground flex-shrink-0"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                </>
               )}
-              {collapsed && (
-                <Link href="/dashboard">
-                  <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
-                    汉
-                  </div>
-                </Link>
-              )}
-              <button
-                onClick={() => setCollapsed(c => !c)}
-                className={cn(
-                  "p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground flex-shrink-0",
-                  collapsed && "absolute right-0 translate-x-1/2 bg-card border shadow-sm z-10",
-                )}
-              >
-                {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-              </button>
             </div>
 
             {/* Nav items */}
