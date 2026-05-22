@@ -2,9 +2,12 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { Home, BookOpen, BarChart2, User, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
+import { useGetDashboardStats } from "@workspace/api-client-react";
 
 export function AppLayout({ children, hideNav = false }: { children: ReactNode; hideNav?: boolean }) {
   const [location] = useLocation();
+  const { data: stats } = useGetDashboardStats();
 
   const navItems = [
     { href: "/dashboard", icon: Home, label: "Trang chủ" },
@@ -69,15 +72,37 @@ export function AppLayout({ children, hideNav = false }: { children: ReactNode; 
               })}
             </nav>
             
-            <div className="p-4 border-t">
-              <div className="flex items-center gap-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  <User className="w-4 h-4 text-muted-foreground" />
+            {/* User + XP section */}
+            <div className="p-4 border-t space-y-3">
+              <div className="flex items-center gap-3 px-2">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-medium truncate">Học viên</p>
-                  <p className="text-xs text-muted-foreground truncate">Mục tiêu HSK 3</p>
+                  <p className="text-sm font-semibold truncate">Học viên</p>
+                  <p className="text-xs text-muted-foreground">
+                    HSK {stats?.currentLevel ?? "—"} → HSK {stats?.targetLevel ?? "—"}
+                  </p>
                 </div>
+              </div>
+
+              {/* XP + level progress */}
+              <div className="bg-primary/5 border border-primary/20 rounded-xl px-3 py-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+                    <span className="text-xs font-semibold text-foreground">
+                      {stats?.totalXp ?? 0} XP
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-bold text-primary">
+                    {stats?.levelProgressPercent ?? 0}%
+                  </span>
+                </div>
+                <Progress value={stats?.levelProgressPercent ?? 0} className="h-1.5" />
+                <p className="text-[10px] text-muted-foreground text-center">
+                  Tiến độ HSK {stats?.currentLevel ?? "—"} · Mục tiêu HSK {stats?.targetLevel ?? "—"}
+                </p>
               </div>
             </div>
           </aside>
@@ -86,7 +111,7 @@ export function AppLayout({ children, hideNav = false }: { children: ReactNode; 
 
       <main className={cn(
         "flex-1 w-full max-w-5xl mx-auto",
-        !hideNav && "pb-20 md:pb-0" // Space for mobile nav
+        !hideNav && "pb-20 md:pb-0"
       )}>
         {children}
       </main>
