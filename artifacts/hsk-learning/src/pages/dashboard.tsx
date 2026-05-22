@@ -49,18 +49,18 @@ export default function DashboardPage() {
       <div className="p-6 space-y-6">
 
         {/* Header greeting */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between bg-primary/10 border-2 border-primary rounded-2xl px-6 py-5">
           <div>
             {profileLoading ? (
-              <Skeleton className="h-7 w-40 mb-1" />
+              <Skeleton className="h-8 w-48 mb-2" />
             ) : (
-              <h1 className="text-xl font-bold">Xin chào, {profile?.name}!</h1>
+              <h1 className="text-2xl font-bold text-primary">Xin chào, {profile?.name}!</h1>
             )}
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-foreground/70 mt-1">
               {daily?.motivationMessage ?? "Hôm nay học một chút nhé!"}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-1.5 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full flex-shrink-0">
             <Flame className="w-4 h-4 fill-orange-500" />
             <span className="text-sm font-bold" data-testid="text-streak">{stats?.currentStreak ?? 0}</span>
           </div>
