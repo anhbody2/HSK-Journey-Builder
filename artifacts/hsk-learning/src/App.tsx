@@ -12,6 +12,12 @@ import CheckpointPage from "@/pages/checkpoint";
 import ProgressPage from "@/pages/progress";
 import RoadmapPage from "@/pages/roadmap";
 import LeaderboardPage from "@/pages/leaderboard";
+import SettingsPage from "@/pages/settings";
+import SettingsActivityPage from "@/pages/settings-activity";
+import SettingsAppearancePage from "@/pages/settings-appearance";
+import SettingsProfilePage from "@/pages/settings-profile";
+import SettingsHelpPage from "@/pages/settings-help";
+import SettingsFeedbackPage from "@/pages/settings-feedback";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +33,12 @@ function Router() {
       <Route path="/progress" component={ProgressPage} />
       <Route path="/roadmap" component={RoadmapPage} />
       <Route path="/leaderboard" component={LeaderboardPage} />
+      <Route path="/settings" component={SettingsPage} />
+      <Route path="/settings/activity" component={SettingsActivityPage} />
+      <Route path="/settings/appearance" component={SettingsAppearancePage} />
+      <Route path="/settings/profile" component={SettingsProfilePage} />
+      <Route path="/settings/help" component={SettingsHelpPage} />
+      <Route path="/settings/feedback" component={SettingsFeedbackPage} />
       <Route component={NotFound} />
     </Switch>
   );
