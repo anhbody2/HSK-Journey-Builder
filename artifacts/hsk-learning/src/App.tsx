@@ -10,6 +10,8 @@ import LearnLevelPage from "@/pages/learn-level";
 import LessonPage from "@/pages/lesson";
 import CheckpointPage from "@/pages/checkpoint";
 import ProgressPage from "@/pages/progress";
+import RoadmapPage from "@/pages/roadmap";
+import LeaderboardPage from "@/pages/leaderboard";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/lesson/:id" component={LessonPage} />
       <Route path="/checkpoint/:level" component={CheckpointPage} />
       <Route path="/progress" component={ProgressPage} />
+      <Route path="/roadmap" component={RoadmapPage} />
+      <Route path="/leaderboard" component={LeaderboardPage} />
       <Route component={NotFound} />
     </Switch>
   );

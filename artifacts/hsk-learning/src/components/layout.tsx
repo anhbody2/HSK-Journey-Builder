@@ -18,6 +18,8 @@ import {
   Check,
   ExternalLink,
   Monitor,
+  Map,
+  Medal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
@@ -244,8 +246,10 @@ export function AppLayout({
 
   const navItems = [
     { href: "/dashboard", icon: Home, label: "Trang chủ" },
+    { href: "/roadmap", icon: Map, label: "Lộ Trình" },
     { href: "/learn/1", icon: BookOpen, label: "Học tập" },
     { href: "/progress", icon: BarChart2, label: "Tiến độ" },
+    { href: "/leaderboard", icon: Medal, label: "Xếp hạng" },
   ];
 
   return (
