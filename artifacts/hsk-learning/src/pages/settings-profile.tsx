@@ -24,7 +24,11 @@ export default function SettingsProfilePage() {
   const [dailyGoal, setDailyGoal] = useState(profile?.dailyGoalMinutes ?? 15);
 
   const handleSave = () => {
-    updateProfile({ name: name || "Học viên", targetLevel, dailyGoalMinutes: dailyGoal });
+    updateProfile({
+      name: name || "Học viên",
+      targetLevel,
+      dailyGoalMinutes: dailyGoal,
+    });
   };
 
   return (
@@ -56,7 +60,7 @@ export default function SettingsProfilePage() {
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder={profile?.name ?? "Nhập tên của bạn..."}
               className="w-full bg-muted/50 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
             />
@@ -69,7 +73,7 @@ export default function SettingsProfilePage() {
               <p className="text-sm font-semibold">Mục tiêu HSK</p>
             </div>
             <div className="flex gap-2">
-              {HSK_LEVELS.map(level => (
+              {HSK_LEVELS.map((level) => (
                 <button
                   key={level}
                   onClick={() => setTargetLevel(level)}
@@ -96,7 +100,7 @@ export default function SettingsProfilePage() {
               <p className="text-sm font-semibold">Mục tiêu hàng ngày</p>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {GOAL_OPTIONS.map(opt => (
+              {GOAL_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setDailyGoal(opt.value)}
