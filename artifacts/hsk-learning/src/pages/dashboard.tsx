@@ -155,28 +155,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Daily progress bar */}
-        <div className="bg-card border rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="font-semibold text-sm">Mục tiêu hôm nay</p>
-            {statsLoading ? (
-              <Skeleton className="h-4 w-20" />
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                {daily?.completedMinutes ?? 0} / {daily?.totalMinutes ?? 15} phút
-              </p>
-            )}
-          </div>
-          {statsLoading ? (
-            <Skeleton className="h-2 w-full rounded-full" />
-          ) : (
-            <Progress
-              value={Math.min(100, ((daily?.completedMinutes ?? 0) / Math.max(daily?.totalMinutes ?? 15, 1)) * 100)}
-              className="h-2"
-            />
-          )}
-        </div>
-
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-3">
           {statsLoading ? (
