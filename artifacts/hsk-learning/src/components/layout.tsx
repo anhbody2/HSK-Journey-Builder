@@ -16,6 +16,14 @@ import {
   Palette,
   HelpCircle,
   MessageSquare,
+  Flame,
+  Gem,
+  Heart,
+  Zap,
+  Lock,
+  ShoppingBag,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
@@ -23,36 +31,11 @@ import { useGetDashboardStats } from "@workspace/api-client-react";
 import { useTheme } from "@/hooks/use-theme";
 
 const SETTINGS_ITEMS = [
-  {
-    icon: Activity,
-    label: "Hoạt động",
-    href: "/settings/activity",
-    iconBg: "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
-  },
-  {
-    icon: User,
-    label: "Hồ sơ học viên",
-    href: "/settings/profile",
-    iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
-  },
-  {
-    icon: Palette,
-    label: "Giao diện",
-    href: "/settings/appearance",
-    iconBg: "bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400",
-  },
-  {
-    icon: HelpCircle,
-    label: "Trợ giúp",
-    href: "/settings/help",
-    iconBg: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
-  },
-  {
-    icon: MessageSquare,
-    label: "Gửi phản hồi",
-    href: "/settings/feedback",
-    iconBg: "bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400",
-  },
+  { icon: Activity, label: "Hoạt động", href: "/settings/activity", iconBg: "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400" },
+  { icon: User, label: "Hồ sơ học viên", href: "/settings/profile", iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400" },
+  { icon: Palette, label: "Giao diện", href: "/settings/appearance", iconBg: "bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400" },
+  { icon: HelpCircle, label: "Trợ giúp", href: "/settings/help", iconBg: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400" },
+  { icon: MessageSquare, label: "Gửi phản hồi", href: "/settings/feedback", iconBg: "bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400" },
 ];
 
 function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -63,29 +46,20 @@ function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }
         "fixed left-0 top-0 h-screen w-72 bg-card border-r shadow-xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
         open ? "translate-x-0" : "-translate-x-full",
       )}>
-        {/* Header */}
         <div className="flex items-center justify-between px-5 h-16 border-b flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <Settings className="w-4 h-4 text-primary" />
             <span className="font-semibold text-sm">Cài đặt</span>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-          >
+          <button onClick={onClose} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
-
-        {/* Settings list */}
         <div className="flex-1 overflow-y-auto py-2">
           {SETTINGS_ITEMS.map(({ icon: Icon, label, href, iconBg }) => (
             <Link key={href} href={href} onClick={onClose}>
               <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/60 transition-colors cursor-pointer">
-                <div className={cn(
-                  "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
-                  iconBg,
-                )}>
+                <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", iconBg)}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
@@ -94,15 +68,215 @@ function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }
             </Link>
           ))}
         </div>
-
-        {/* Footer */}
         <div className="px-5 py-3 border-t flex-shrink-0">
-          <p className="text-[11px] text-muted-foreground text-center">
-            HSK Smart Learning · v1.0
-          </p>
+          <p className="text-[11px] text-muted-foreground text-center">HSK Smart Learning · v1.0</p>
         </div>
       </div>
     </>
+  );
+}
+
+function RightPanel() {
+  const { data: stats } = useGetDashboardStats();
+
+  const streak = stats?.currentStreak ?? 0;
+  const xp = stats?.totalXp ?? 0;
+  const gems = stats?.vocabularyLearned ?? 0;
+  const hearts = 5;
+  const completedLessons = stats?.completedLessons ?? 0;
+  const lessonsToLeaderboard = Math.max(0, 3 - completedLessons);
+
+  const dailyXpGoal = 50;
+  const dailyXpEarned = Math.min(xp % dailyXpGoal || (xp > 0 ? dailyXpGoal : 0), dailyXpGoal);
+  const dailyProgress = Math.min(100, (dailyXpEarned / dailyXpGoal) * 100);
+
+  return (
+    <aside className="hidden xl:flex flex-col w-80 flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-l bg-card">
+      <div className="p-5 space-y-4">
+
+        {/* Stats strip */}
+        <div className="flex items-center justify-between px-1">
+          {/* Streak */}
+          <Link href="/progress">
+            <button className="flex items-center gap-1.5 group">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Flame className="w-6 h-6 text-orange-500 fill-orange-400 group-hover:scale-110 transition-transform" />
+              </div>
+              <span className={cn(
+                "text-sm font-extrabold tracking-tight",
+                streak > 0 ? "text-orange-500" : "text-muted-foreground",
+              )}>
+                {streak}
+              </span>
+            </button>
+          </Link>
+
+          {/* XP / Gems */}
+          <Link href="/leaderboard">
+            <button className="flex items-center gap-1.5 group">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Gem className="w-6 h-6 text-sky-500 fill-sky-400 group-hover:scale-110 transition-transform" />
+              </div>
+              <span className="text-sm font-extrabold tracking-tight text-sky-500">{xp}</span>
+            </button>
+          </Link>
+
+          {/* Vocabulary gems */}
+          <Link href="/progress">
+            <button className="flex items-center gap-1.5 group">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Trophy className="w-6 h-6 text-yellow-500 fill-yellow-400 group-hover:scale-110 transition-transform" />
+              </div>
+              <span className="text-sm font-extrabold tracking-tight text-yellow-500">{gems}</span>
+            </button>
+          </Link>
+
+          {/* Hearts */}
+          <button className="flex items-center gap-1.5 group">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Heart className="w-6 h-6 text-rose-500 fill-rose-400 group-hover:scale-110 transition-transform" />
+            </div>
+            <span className="text-sm font-extrabold tracking-tight text-rose-500">{hearts}</span>
+          </button>
+
+          {/* Shop */}
+          <Link href="/settings">
+            <button className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted transition-colors group">
+              <ShoppingBag className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </button>
+          </Link>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t" />
+
+        {/* Premium / Super card */}
+        <div className="rounded-2xl border-2 border-yellow-400/60 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/40 dark:to-amber-950/30 p-4 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+                <Sparkles className="w-3 h-3" />
+                HSK Smart+
+              </div>
+              <p className="font-bold text-sm text-foreground leading-snug">
+                Nâng cấp trải nghiệm học
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Không giới hạn bài học, lộ trình cá nhân hóa và luyện tập nâng cao!
+              </p>
+            </div>
+          </div>
+          <button className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white font-bold text-xs rounded-xl transition-all hover:shadow-md active:scale-95 uppercase tracking-wider">
+            Dùng thử miễn phí 1 tuần
+          </button>
+        </div>
+
+        {/* Leaderboard unlock card */}
+        <div className="rounded-2xl border bg-card p-4 space-y-3">
+          <p className="font-bold text-sm text-foreground">
+            {lessonsToLeaderboard > 0 ? "Mở khóa bảng xếp hạng!" : "Bảng xếp hạng đã mở!"}
+          </p>
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
+              lessonsToLeaderboard > 0 ? "bg-muted" : "bg-yellow-100",
+            )}>
+              {lessonsToLeaderboard > 0
+                ? <Lock className="w-6 h-6 text-muted-foreground" />
+                : <Medal className="w-6 h-6 text-yellow-600" />
+              }
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {lessonsToLeaderboard > 0
+                ? `Hoàn thành thêm ${lessonsToLeaderboard} bài học để bắt đầu cạnh tranh`
+                : "Bạn đang xếp hạng cùng hàng nghìn học viên khác"}
+            </p>
+          </div>
+          <Link href="/leaderboard">
+            <button className="w-full py-2 border-2 border-primary/30 text-primary font-bold text-xs rounded-xl hover:bg-primary/5 transition-colors uppercase tracking-wider">
+              Xem bảng xếp hạng →
+            </button>
+          </Link>
+        </div>
+
+        {/* Daily quests */}
+        <div className="rounded-2xl border bg-card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="font-bold text-sm text-foreground">Nhiệm vụ hàng ngày</p>
+            <Link href="/progress">
+              <button className="text-xs font-bold text-sky-500 hover:underline uppercase tracking-wide">
+                Xem tất cả
+              </button>
+            </Link>
+          </div>
+
+          {/* Quest 1: Earn XP */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                <Zap className="w-5 h-5 text-yellow-500 fill-yellow-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground">
+                  Kiếm {dailyXpGoal} XP hôm nay
+                </p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full transition-all duration-500"
+                      style={{ width: `${dailyProgress}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-muted-foreground whitespace-nowrap">
+                    {dailyXpEarned} / {dailyXpGoal}
+                  </span>
+                  {dailyProgress >= 100 && (
+                    <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                      <ShoppingBag className="w-3.5 h-3.5 text-amber-600" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quest 2: Complete a lesson */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-5 h-5 text-blue-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground">Hoàn thành 1 bài học</p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full transition-all duration-500"
+                      style={{ width: completedLessons > 0 ? "100%" : "0%" }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-muted-foreground whitespace-nowrap">
+                    {completedLessons > 0 ? "1 / 1" : "0 / 1"}
+                  </span>
+                  {completedLessons > 0 && (
+                    <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Link href="/learn/1">
+            <button className="w-full mt-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary/10 hover:bg-primary/15 text-primary font-semibold text-xs transition-colors">
+              Bắt đầu học <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </Link>
+        </div>
+
+      </div>
+    </aside>
   );
 }
 
@@ -116,7 +290,7 @@ export function AppLayout({
   const [location] = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  useTheme(); // apply saved theme on mount
+  useTheme();
   const { data: stats } = useGetDashboardStats();
 
   const navItems = [
@@ -164,7 +338,7 @@ export function AppLayout({
             </button>
           </nav>
 
-          {/* Desktop Sidebar */}
+          {/* Desktop Left Sidebar */}
           <aside className={cn(
             "hidden md:flex flex-col border-r bg-card h-screen sticky top-0 transition-all duration-300 ease-in-out flex-shrink-0",
             collapsed ? "w-16" : "w-64",
@@ -252,10 +426,7 @@ export function AppLayout({
                     <User className="w-4 h-4 text-primary" />
                   </div>
                   <div className="w-full bg-primary/10 rounded-full overflow-hidden h-1.5" title={`${stats?.levelProgressPercent ?? 0}%`}>
-                    <div
-                      className="h-full bg-primary transition-all duration-500"
-                      style={{ width: `${stats?.levelProgressPercent ?? 0}%` }}
-                    />
+                    <div className="h-full bg-primary transition-all duration-500" style={{ width: `${stats?.levelProgressPercent ?? 0}%` }} />
                   </div>
                   <div title={`${stats?.totalXp ?? 0} XP`}>
                     <Trophy className="w-3.5 h-3.5 text-yellow-500" />
@@ -278,13 +449,9 @@ export function AppLayout({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                        <span className="text-xs font-semibold text-foreground">
-                          {stats?.totalXp ?? 0} XP
-                        </span>
+                        <span className="text-xs font-semibold text-foreground">{stats?.totalXp ?? 0} XP</span>
                       </div>
-                      <span className="text-[11px] font-bold text-primary">
-                        {stats?.levelProgressPercent ?? 0}%
-                      </span>
+                      <span className="text-[11px] font-bold text-primary">{stats?.levelProgressPercent ?? 0}%</span>
                     </div>
                     <Progress value={stats?.levelProgressPercent ?? 0} className="h-1.5" />
                     <p className="text-[10px] text-muted-foreground text-center">
@@ -298,9 +465,13 @@ export function AppLayout({
         </>
       )}
 
+      {/* Main content */}
       <main className={cn("flex-1 w-full min-w-0", !hideNav && "pb-20 md:pb-0")}>
         {children}
       </main>
+
+      {/* Right panel — Duolingo-style, desktop only */}
+      {!hideNav && <RightPanel />}
     </div>
   );
 }
