@@ -75,11 +75,12 @@
 
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
-
+  --glass-bg-dark: rgba(255, 255, 255, 0.6);
   --glass-bg: rgba(255, 255, 255, 0.45);
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-blur: blur(18px);
-
+   --glass-primary-red: rgba(226, 69, 54, 0.9);
+   --glass-secondary-red: rgb(226, 75, 54, 0.9);
   --background: 40 33% 96%; /* warm parchment */
   --foreground: 220 15% 15%; /* deep ink */
   --border: 40 15% 85%;
@@ -220,10 +221,12 @@
 
 /* Override specific Tailwind bg utilities to be glassy */
 .bg-card { background: var(--glass-bg) !important; }
+.bg-card.no-glass { background: var(--color-card) !important; }
 .bg-background { background: transparent !important; }
 .bg-sidebar { background: var(--glass-bg) !important; }
 .bg-popover { background: var(--glass-bg) !important; }
-
+.bg-red-primary { background: var(--glass-primary-red) !important; }
+.border-secondary{ border-color: var(--glass-secondary-red) !important; }
 /* Sidebars and navbars get the blur for depth */
 aside.bg-card,
 nav.bg-background,
