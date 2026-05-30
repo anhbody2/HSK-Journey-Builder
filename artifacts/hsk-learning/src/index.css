@@ -76,6 +76,10 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(18px);
+
   --background: 40 33% 96%; /* warm parchment */
   --foreground: 220 15% 15%; /* deep ink */
   --border: 40 15% 85%;
@@ -146,6 +150,9 @@
 }
 
 .dark {
+  --glass-bg: rgba(20, 22, 35, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.10);
+
   --background: 220 15% 10%;
   --foreground: 40 33% 96%;
   --border: 220 15% 20%;
@@ -198,6 +205,29 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background: transparent !important;
   }
+}
+
+/* Glass surfaces — applied selectively so content stays visible */
+.glass-surface {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Override specific Tailwind bg utilities to be glassy */
+.bg-card { background: var(--glass-bg) !important; }
+.bg-background { background: transparent !important; }
+.bg-sidebar { background: var(--glass-bg) !important; }
+.bg-popover { background: var(--glass-bg) !important; }
+
+/* Sidebars and navbars get the blur for depth */
+aside.bg-card,
+nav.bg-background,
+.fixed.bg-background,
+.sticky.bg-card {
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
