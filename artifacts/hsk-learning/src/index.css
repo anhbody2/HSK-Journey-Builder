@@ -150,8 +150,9 @@
 }
 
 .dark {
-  --glass-bg: rgba(20, 22, 35, 0.52);
-  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-bg: rgba(8, 6, 20, 0.55);
+  --glass-border: rgba(180, 100, 255, 0.15);
+  --glass-blur: blur(22px);
 
   --background: 220 15% 10%;
   --foreground: 40 33% 96%;

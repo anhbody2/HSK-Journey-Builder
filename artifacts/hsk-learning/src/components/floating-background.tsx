@@ -11,6 +11,29 @@ interface Blob {
   opacity: number;
 }
 
+function isDark() {
+  return document.documentElement.classList.contains("dark");
+}
+
+const LIGHT_HUES = [0, 30, 60, 120, 180, 240, 280, 320];
+const DARK_HUES  = [260, 280, 300, 200, 180, 320, 240, 220];
+
+function makeBlobs(dark: boolean): Blob[] {
+  const hues = dark ? DARK_HUES : LIGHT_HUES;
+  return Array.from({ length: 8 }, (_, i) => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * (dark ? 0.45 : 0.6),
+    vy: (Math.random() - 0.5) * (dark ? 0.45 : 0.6),
+    radius: (dark ? 220 : 200) + Math.random() * 220,
+    hue: hues[i % hues.length] + (Math.random() - 0.5) * 20,
+    hueSpeed: (Math.random() - 0.5) * (dark ? 0.25 : 0.4),
+    opacity: dark
+      ? 0.32 + Math.random() * 0.18
+      : 0.18 + Math.random() * 0.12,
+  }));
+}
+
 export function FloatingBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -21,8 +44,8 @@ export function FloatingBackground() {
     if (!ctx) return;
 
     let animId: number;
-    const blobs: Blob[] = [];
-    const BLOB_COUNT = 7;
+    let blobs: Blob[] = makeBlobs(isDark());
+    let dark = isDark();
 
     function resize() {
       if (!canvas) return;
@@ -30,25 +53,15 @@ export function FloatingBackground() {
       canvas.height = window.innerHeight;
     }
 
-    function initBlobs() {
-      blobs.length = 0;
-      for (let i = 0; i < BLOB_COUNT; i++) {
-        blobs.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: (Math.random() - 0.5) * 0.6,
-          radius: 200 + Math.random() * 200,
-          hue: Math.random() * 360,
-          hueSpeed: (Math.random() - 0.5) * 0.4,
-          opacity: 0.22 + Math.random() * 0.12,
-        });
-      }
-    }
-
     function draw() {
       if (!canvas || !ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (dark) {
+        ctx.fillStyle = "rgba(10, 10, 20, 1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
 
       for (const b of blobs) {
         b.x += b.vx;
@@ -60,9 +73,12 @@ export function FloatingBackground() {
         if (b.y < -b.radius) b.y = canvas.height + b.radius;
         if (b.y > canvas.height + b.radius) b.y = -b.radius;
 
+        const sat  = dark ? "100%" : "85%";
+        const lit  = dark ? "55%"  : "68%";
+
         const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.radius);
-        grad.addColorStop(0, `hsla(${b.hue}, 90%, 65%, ${b.opacity})`);
-        grad.addColorStop(1, `hsla(${b.hue}, 90%, 65%, 0)`);
+        grad.addColorStop(0, `hsla(${b.hue}, ${sat}, ${lit}, ${b.opacity})`);
+        grad.addColorStop(1, `hsla(${b.hue}, ${sat}, ${lit}, 0)`);
 
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
@@ -73,14 +89,28 @@ export function FloatingBackground() {
       animId = requestAnimationFrame(draw);
     }
 
+    function onThemeChange() {
+      const nowDark = isDark();
+      if (nowDark !== dark) {
+        dark = nowDark;
+        blobs = makeBlobs(dark);
+      }
+    }
+
+    const observer = new MutationObserver(onThemeChange);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     resize();
-    initBlobs();
     draw();
 
     window.addEventListener("resize", resize);
     return () => {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(animId);
+      observer.disconnect();
     };
   }, []);
 
