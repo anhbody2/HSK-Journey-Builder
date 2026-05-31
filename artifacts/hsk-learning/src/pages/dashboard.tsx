@@ -141,10 +141,10 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="p-6 space-y-6">
         {/* Header greeting */}
-        <div className="flex items-center justify-between bg-red-primary border-2 border-secondary rounded-2xl px-9 py-12">
+        <div className="flex items-center justify-between bg-red-primary border-2 border-secondary rounded-2xl px-9 py-40">
           <div>
             {profileLoading ? (
-              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-7 w-48 mb-2" />
             ) : (
               <h1 className="text-2xl font-bold text-primary-foreground">
                 Xin chào, {profile?.name}!
@@ -154,48 +154,6 @@ export default function DashboardPage() {
               {daily?.motivationMessage ?? "Hôm nay học một chút nhé!"}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full flex-shrink-0">
-            <Flame className="w-4 h-4 fill-orange-500" />
-            <span className="text-sm font-bold">
-              {stats?.currentStreak ?? 0}
-            </span>
-          </div>
-        </div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {statsLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-28 rounded-xl" />
-            ))
-          ) : (
-            <>
-              <StatCard
-                label="Tổng XP"
-                value={stats?.totalXp ?? 0}
-                icon={Trophy}
-                color="bg-yellow-100 text-yellow-700"
-              />
-              <StatCard
-                label="Từ vựng đã học"
-                value={stats?.vocabularyLearned ?? 0}
-                icon={BookOpen}
-                color="bg-primary/10 text-primary"
-              />
-              <StatCard
-                label="Bài đã hoàn thành"
-                value={stats?.completedLessons ?? 0}
-                icon={CheckCircle}
-                color="bg-green-100 text-green-700"
-              />
-              <StatCard
-                label="Hôm nay"
-                value={`${stats?.todayMinutes ?? 0} ph`}
-                icon={Clock}
-                color="bg-blue-100 text-blue-700"
-              />
-            </>
-          )}
         </div>
 
         {/* ✨ New Features section (replaces HSK level progress) */}

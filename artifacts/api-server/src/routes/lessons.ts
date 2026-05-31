@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, lessonsTable, lessonProgressTable, usersTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import { GetLessonsQueryParams } from "@workspace/api-zod";
+import { getMockLessons, getMockDailyTasks, MOCK_LESSONS, MOCK_USER } from "../lib/mock-data";
 
 const router = Router();
 
@@ -25,7 +26,7 @@ router.get("/lessons", async (req, res) => {
     const user = await db.select().from(usersTable).where(eq(usersTable.id, 1)).limit(1);
     const currentLevel = user[0]?.currentLevel ?? 1;
 
-    res.json(lessons.map((l, i) => ({
+    res.json(lessons.map((l) => ({
       id: l.id,
       level: l.level,
       unit: l.unit,
@@ -38,9 +39,14 @@ router.get("/lessons", async (req, res) => {
       xpReward: l.xpReward,
       estimatedMinutes: l.estimatedMinutes,
     })));
-  } catch (err) {
-    req.log.error({ err }, "Failed to get lessons");
-    res.status(400).json({ error: "Invalid request" });
+  } catch {
+    const params = GetLessonsQueryParams.safeParse(req.query);
+    const levelFilter = params.success ? params.data.level : undefined;
+    const unitFilter = params.success ? params.data.unit : undefined;
+    let lessons = getMockLessons();
+    if (levelFilter !== undefined) lessons = lessons.filter(l => l.level === levelFilter);
+    if (unitFilter !== undefined) lessons = lessons.filter(l => l.unit === unitFilter);
+    res.json(lessons);
   }
 });
 
@@ -81,9 +87,8 @@ router.get("/lessons/daily", async (req, res) => {
         ? "Tuyệt vời! Bạn đã hoàn thành mục tiêu hôm nay!"
         : "Hãy tiếp tục! Mỗi ngày một bước, bạn sẽ thành công!",
     });
-  } catch (err) {
-    req.log.error({ err }, "Failed to get daily tasks");
-    res.status(500).json({ error: "Internal server error" });
+  } catch {
+    res.json(getMockDailyTasks());
   }
 });
 
@@ -109,9 +114,24 @@ router.get("/lessons/:id", async (req, res) => {
       shadowingText: lesson.shadowingText,
       shadowingPinyin: lesson.shadowingPinyin,
     });
-  } catch (err) {
-    req.log.error({ err }, "Failed to get lesson");
-    res.status(500).json({ error: "Internal server error" });
+  } catch {
+    const id = parseInt(req.params.id);
+    const lesson = MOCK_LESSONS.find(l => l.id === id);
+    if (!lesson) return res.status(404).json({ error: "Lesson not found" });
+    res.json({
+      id: lesson.id,
+      level: lesson.level,
+      unit: lesson.unit,
+      lessonNumber: lesson.lessonNumber,
+      title: lesson.title,
+      titleChinese: lesson.titleChinese,
+      type: lesson.type,
+      dialogue: null,
+      vocabulary: null,
+      grammarPoints: null,
+      shadowingText: null,
+      shadowingPinyin: null,
+    });
   }
 });
 

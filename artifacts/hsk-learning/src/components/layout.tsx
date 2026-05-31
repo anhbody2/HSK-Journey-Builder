@@ -73,76 +73,12 @@ function SettingsPanel({
   open: boolean;
   onClose: () => void;
 }) {
-  const settingsList = (
-    <ul className="py-1">
-      {SETTINGS_ITEMS.map(({ icon: Icon, label, href, iconBg }) => (
-        <li key={href}>
-          <Link href={href} onClick={onClose}>
-            <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/60 active:bg-muted transition-colors cursor-pointer">
-              <div
-                className={cn(
-                  "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
-                  iconBg,
-                )}
-              >
-                <Icon className="w-4 h-4" />
-              </div>
-              <span className="flex-1 text-sm font-medium text-foreground">
-                {label}
-              </span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </div>
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-
   return (
     <>
-      {/* Backdrop */}
-      {open && (
-        <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Mobile: drop down from top */}
+      {open && <div className="fixed inset-0 z-40" onClick={onClose} />}
       <div
         className={cn(
-          "md:hidden fixed left-0 right-0 top-0 z-50 bg-card border-b shadow-xl",
-          "transition-all duration-300 ease-in-out origin-top",
-          open
-            ? "translate-y-0 opacity-100 pointer-events-auto"
-            : "-translate-y-full opacity-0 pointer-events-none",
-        )}
-      >
-        <div className="flex items-center justify-between px-5 h-14 border-b">
-          <div className="flex items-center gap-2.5">
-            <Settings className="w-4 h-4 text-primary" />
-            <span className="font-semibold text-sm">Cài đặt</span>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-        {settingsList}
-        <div className="px-5 py-2.5 border-t">
-          <p className="text-[11px] text-muted-foreground text-center">
-            HSK Smart Learning · v1.0
-          </p>
-        </div>
-      </div>
-
-      {/* Desktop: slide in from left */}
-      <div
-        className={cn(
-          "hidden md:flex fixed left-0 top-0 h-screen w-64 bg-card border-r shadow-xl z-50 flex-col",
-          "transition-transform duration-300 ease-in-out",
+          "fixed left-0 top-0 h-screen w-64 bg-card no-glass border-r shadow-xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -158,8 +94,25 @@ function SettingsPanel({
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto">
-          {settingsList}
+        <div className="flex-1 overflow-y-auto py-2">
+          {SETTINGS_ITEMS.map(({ icon: Icon, label, href, iconBg }) => (
+            <Link key={href} href={href} onClick={onClose}>
+              <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/60 transition-colors cursor-pointer">
+                <div
+                  className={cn(
+                    "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
+                    iconBg,
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                </div>
+                <span className="flex-1 text-sm font-medium text-foreground">
+                  {label}
+                </span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </Link>
+          ))}
         </div>
         <div className="px-5 py-3 border-t flex-shrink-0">
           <p className="text-[11px] text-muted-foreground text-center">
@@ -576,18 +529,6 @@ export function AppLayout({
                     title="Học viên"
                   >
                     <User className="w-4 h-4 text-primary" />
-                  </div>
-                  <div
-                    className="w-full bg-primary/10 rounded-full overflow-hidden h-1.5"
-                    title={`${stats?.levelProgressPercent ?? 0}%`}
-                  >
-                    <div
-                      className="h-full bg-primary transition-all duration-500"
-                      style={{ width: `${stats?.levelProgressPercent ?? 0}%` }}
-                    />
-                  </div>
-                  <div title={`${stats?.totalXp ?? 0} XP`}>
-                    <Trophy className="w-3.5 h-3.5 text-yellow-500" />
                   </div>
                 </div>
               ) : (
