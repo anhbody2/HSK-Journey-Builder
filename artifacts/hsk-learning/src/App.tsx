@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing";
 import OnboardingPage from "@/pages/onboarding";
 import DashboardPage from "@/pages/dashboard";
+import LearnPage from "@/pages/learn";
 import LearnLevelPage from "@/pages/learn-level";
 import LessonPage from "@/pages/lesson";
 import CheckpointPage from "@/pages/checkpoint";
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/learn" component={LearnPage} />
       <Route path="/learn/:level" component={LearnLevelPage} />
       <Route path="/lesson/:id" component={LessonPage} />
       <Route path="/checkpoint/:level" component={CheckpointPage} />

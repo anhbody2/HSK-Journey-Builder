@@ -125,6 +125,52 @@ export function getMockDashboardStats() {
   };
 }
 
+export interface MockVocabWord {
+  id: number;
+  level: number;
+  chinese: string;
+  pinyin: string;
+  meaning: string;
+  exampleChinese: string;
+  examplePinyin: string;
+  exampleMeaning: string;
+}
+
+export const MOCK_VOCABULARY: MockVocabWord[] = [
+  // HSK 1
+  { id: 1,  level: 1, chinese: "你好",   pinyin: "nǐ hǎo",     meaning: "Xin chào",       exampleChinese: "你好！我是学生。",          examplePinyin: "Nǐ hǎo! Wǒ shì xuésheng.",       exampleMeaning: "Xin chào! Tôi là học sinh." },
+  { id: 2,  level: 1, chinese: "谢谢",   pinyin: "xiè xie",    meaning: "Cảm ơn",         exampleChinese: "谢谢你的帮助。",             examplePinyin: "Xièxie nǐ de bāngzhù.",          exampleMeaning: "Cảm ơn sự giúp đỡ của bạn." },
+  { id: 3,  level: 1, chinese: "再见",   pinyin: "zài jiàn",   meaning: "Tạm biệt",       exampleChinese: "再见，明天见！",              examplePinyin: "Zàijiàn, míngtiān jiàn!",        exampleMeaning: "Tạm biệt, hẹn gặp ngày mai!" },
+  { id: 4,  level: 1, chinese: "我",     pinyin: "wǒ",         meaning: "Tôi / Mình",     exampleChinese: "我是中国人。",               examplePinyin: "Wǒ shì Zhōngguórén.",            exampleMeaning: "Tôi là người Trung Quốc." },
+  { id: 5,  level: 1, chinese: "你",     pinyin: "nǐ",         meaning: "Bạn / Anh / Chị",exampleChinese: "你叫什么名字？",             examplePinyin: "Nǐ jiào shénme míngzi?",         exampleMeaning: "Bạn tên là gì?" },
+  { id: 6,  level: 1, chinese: "是",     pinyin: "shì",        meaning: "Là (động từ)",   exampleChinese: "这是我的书。",               examplePinyin: "Zhè shì wǒ de shū.",             exampleMeaning: "Đây là cuốn sách của tôi." },
+  { id: 7,  level: 1, chinese: "不",     pinyin: "bù",         meaning: "Không",          exampleChinese: "我不是老师。",               examplePinyin: "Wǒ bù shì lǎoshī.",              exampleMeaning: "Tôi không phải giáo viên." },
+  { id: 8,  level: 1, chinese: "好",     pinyin: "hǎo",        meaning: "Tốt / Khỏe",    exampleChinese: "今天天气很好。",              examplePinyin: "Jīntiān tiānqì hěn hǎo.",        exampleMeaning: "Hôm nay thời tiết rất đẹp." },
+  { id: 9,  level: 1, chinese: "人",     pinyin: "rén",        meaning: "Người",          exampleChinese: "他是一个好人。",             examplePinyin: "Tā shì yī gè hǎo rén.",          exampleMeaning: "Anh ấy là một người tốt." },
+  { id: 10, level: 1, chinese: "中国",   pinyin: "Zhōngguó",   meaning: "Trung Quốc",     exampleChinese: "中国很大。",                 examplePinyin: "Zhōngguó hěn dà.",               exampleMeaning: "Trung Quốc rất rộng lớn." },
+  { id: 11, level: 1, chinese: "学生",   pinyin: "xuésheng",   meaning: "Học sinh",       exampleChinese: "她是大学生。",               examplePinyin: "Tā shì dàxuéshēng.",             exampleMeaning: "Cô ấy là sinh viên đại học." },
+  { id: 12, level: 1, chinese: "老师",   pinyin: "lǎoshī",     meaning: "Giáo viên",      exampleChinese: "老师很好。",                 examplePinyin: "Lǎoshī hěn hǎo.",                exampleMeaning: "Giáo viên rất tốt." },
+  { id: 13, level: 1, chinese: "一",     pinyin: "yī",         meaning: "Một (số 1)",     exampleChinese: "我有一本书。",               examplePinyin: "Wǒ yǒu yī běn shū.",             exampleMeaning: "Tôi có một cuốn sách." },
+  { id: 14, level: 1, chinese: "两",     pinyin: "liǎng",      meaning: "Hai (số lượng)", exampleChinese: "我有两个苹果。",             examplePinyin: "Wǒ yǒu liǎng gè píngguǒ.",      exampleMeaning: "Tôi có hai quả táo." },
+  { id: 15, level: 1, chinese: "三",     pinyin: "sān",        meaning: "Ba (số 3)",      exampleChinese: "她有三个孩子。",             examplePinyin: "Tā yǒu sān gè háizi.",           exampleMeaning: "Cô ấy có ba đứa con." },
+  { id: 16, level: 1, chinese: "吃",     pinyin: "chī",        meaning: "Ăn",             exampleChinese: "我想吃米饭。",               examplePinyin: "Wǒ xiǎng chī mǐfàn.",            exampleMeaning: "Tôi muốn ăn cơm." },
+  { id: 17, level: 1, chinese: "喝",     pinyin: "hē",         meaning: "Uống",           exampleChinese: "她喜欢喝茶。",               examplePinyin: "Tā xǐhuān hē chá.",              exampleMeaning: "Cô ấy thích uống trà." },
+  { id: 18, level: 1, chinese: "水",     pinyin: "shuǐ",       meaning: "Nước",           exampleChinese: "请给我一杯水。",             examplePinyin: "Qǐng gěi wǒ yī bēi shuǐ.",      exampleMeaning: "Cho tôi một ly nước." },
+  { id: 19, level: 1, chinese: "爸爸",   pinyin: "bàba",       meaning: "Bố / Cha",       exampleChinese: "我爸爸是医生。",             examplePinyin: "Wǒ bàba shì yīshēng.",           exampleMeaning: "Bố tôi là bác sĩ." },
+  { id: 20, level: 1, chinese: "妈妈",   pinyin: "māma",       meaning: "Mẹ / Mẹ ơi",    exampleChinese: "妈妈在家。",                 examplePinyin: "Māma zài jiā.",                  exampleMeaning: "Mẹ đang ở nhà." },
+  // HSK 2
+  { id: 21, level: 2, chinese: "时间",   pinyin: "shíjiān",    meaning: "Thời gian",      exampleChinese: "我没有时间。",               examplePinyin: "Wǒ méiyǒu shíjiān.",             exampleMeaning: "Tôi không có thời gian." },
+  { id: 22, level: 2, chinese: "钱",     pinyin: "qián",       meaning: "Tiền",           exampleChinese: "这个多少钱？",               examplePinyin: "Zhège duōshǎo qián?",            exampleMeaning: "Cái này bao nhiêu tiền?" },
+  { id: 23, level: 2, chinese: "买",     pinyin: "mǎi",        meaning: "Mua",            exampleChinese: "我想买这件衣服。",           examplePinyin: "Wǒ xiǎng mǎi zhè jiàn yīfu.",   exampleMeaning: "Tôi muốn mua cái áo này." },
+  { id: 24, level: 2, chinese: "医院",   pinyin: "yīyuàn",     meaning: "Bệnh viện",      exampleChinese: "医院在哪里？",               examplePinyin: "Yīyuàn zài nǎlǐ?",              exampleMeaning: "Bệnh viện ở đâu?" },
+  { id: 25, level: 2, chinese: "天气",   pinyin: "tiānqì",     meaning: "Thời tiết",      exampleChinese: "今天天气怎么样？",           examplePinyin: "Jīntiān tiānqì zěnmeyàng?",     exampleMeaning: "Hôm nay thời tiết thế nào?" },
+];
+
+export function getMockVocabulary(level?: number): MockVocabWord[] {
+  if (level !== undefined) return MOCK_VOCABULARY.filter(v => v.level === level);
+  return MOCK_VOCABULARY;
+}
+
 export function getMockDailyTasks() {
   const level1Lessons = MOCK_LESSONS.filter((l) => l.level === 1).slice(0, 4);
   const today = new Date().toISOString().split("T")[0];
