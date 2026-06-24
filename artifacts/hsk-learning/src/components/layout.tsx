@@ -31,27 +31,66 @@ import { useGetDashboardStats } from "@workspace/api-client-react";
 import { useTheme } from "@/hooks/use-theme";
 
 const SETTINGS_ITEMS = [
-  { icon: Activity, label: "Hoạt động", href: "/settings/activity", iconBg: "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400" },
-  { icon: User, label: "Hồ sơ học viên", href: "/settings/profile", iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400" },
-  { icon: Palette, label: "Giao diện", href: "/settings/appearance", iconBg: "bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400" },
-  { icon: HelpCircle, label: "Trợ giúp", href: "/settings/help", iconBg: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400" },
-  { icon: MessageSquare, label: "Gửi phản hồi", href: "/settings/feedback", iconBg: "bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400" },
+  {
+    icon: Activity,
+    label: "Hoạt động",
+    href: "/settings/activity",
+    iconBg:
+      "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
+  },
+  {
+    icon: User,
+    label: "Hồ sơ học viên",
+    href: "/settings/profile",
+    iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+  },
+  {
+    icon: Palette,
+    label: "Giao diện",
+    href: "/settings/appearance",
+    iconBg:
+      "bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400",
+  },
+  {
+    icon: HelpCircle,
+    label: "Trợ giúp",
+    href: "/settings/help",
+    iconBg:
+      "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
+  },
+  {
+    icon: MessageSquare,
+    label: "Gửi phản hồi",
+    href: "/settings/feedback",
+    iconBg: "bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400",
+  },
 ];
 
-function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+function SettingsPanel({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   return (
     <>
       {open && <div className="fixed inset-0 z-40" onClick={onClose} />}
-      <div className={cn(
-        "fixed left-0 top-0 h-screen w-72 bg-card border-r shadow-xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
-        open ? "translate-x-0" : "-translate-x-full",
-      )}>
+      <div
+        className={cn(
+          "fixed left-0 top-0 h-screen w-64 bg-card no-glass border-r shadow-xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
+          open ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
         <div className="flex items-center justify-between px-5 h-16 border-b flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <Settings className="w-4 h-4 text-primary" />
             <span className="font-semibold text-sm">Cài đặt</span>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -59,17 +98,26 @@ function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }
           {SETTINGS_ITEMS.map(({ icon: Icon, label, href, iconBg }) => (
             <Link key={href} href={href} onClick={onClose}>
               <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/60 transition-colors cursor-pointer">
-                <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0", iconBg)}>
+                <div
+                  className={cn(
+                    "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
+                    iconBg,
+                  )}
+                >
                   <Icon className="w-4 h-4" />
                 </div>
-                <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
+                <span className="flex-1 text-sm font-medium text-foreground">
+                  {label}
+                </span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </Link>
           ))}
         </div>
         <div className="px-5 py-3 border-t flex-shrink-0">
-          <p className="text-[11px] text-muted-foreground text-center">HSK Smart Learning · v1.0</p>
+          <p className="text-[11px] text-muted-foreground text-center">
+            HSK Smart Learning · v1.0
+          </p>
         </div>
       </div>
     </>
@@ -87,13 +135,15 @@ function RightPanel() {
   const lessonsToLeaderboard = Math.max(0, 3 - completedLessons);
 
   const dailyXpGoal = 50;
-  const dailyXpEarned = Math.min(xp % dailyXpGoal || (xp > 0 ? dailyXpGoal : 0), dailyXpGoal);
+  const dailyXpEarned = Math.min(
+    xp % dailyXpGoal || (xp > 0 ? dailyXpGoal : 0),
+    dailyXpGoal,
+  );
   const dailyProgress = Math.min(100, (dailyXpEarned / dailyXpGoal) * 100);
 
   return (
     <aside className="hidden xl:flex flex-col w-80 flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-l bg-card">
       <div className="p-5 space-y-4">
-
         {/* Stats strip */}
         <div className="flex items-center justify-between px-1">
           {/* Streak */}
@@ -102,10 +152,12 @@ function RightPanel() {
               <div className="w-8 h-8 flex items-center justify-center">
                 <Flame className="w-6 h-6 text-orange-500 fill-orange-400 group-hover:scale-110 transition-transform" />
               </div>
-              <span className={cn(
-                "text-sm font-extrabold tracking-tight",
-                streak > 0 ? "text-orange-500" : "text-muted-foreground",
-              )}>
+              <span
+                className={cn(
+                  "text-sm font-extrabold tracking-tight",
+                  streak > 0 ? "text-orange-500" : "text-muted-foreground",
+                )}
+              >
                 {streak}
               </span>
             </button>
@@ -117,7 +169,9 @@ function RightPanel() {
               <div className="w-8 h-8 flex items-center justify-center">
                 <Gem className="w-6 h-6 text-sky-500 fill-sky-400 group-hover:scale-110 transition-transform" />
               </div>
-              <span className="text-sm font-extrabold tracking-tight text-sky-500">{xp}</span>
+              <span className="text-sm font-extrabold tracking-tight text-sky-500">
+                {xp}
+              </span>
             </button>
           </Link>
 
@@ -127,7 +181,9 @@ function RightPanel() {
               <div className="w-8 h-8 flex items-center justify-center">
                 <Trophy className="w-6 h-6 text-yellow-500 fill-yellow-400 group-hover:scale-110 transition-transform" />
               </div>
-              <span className="text-sm font-extrabold tracking-tight text-yellow-500">{gems}</span>
+              <span className="text-sm font-extrabold tracking-tight text-yellow-500">
+                {gems}
+              </span>
             </button>
           </Link>
 
@@ -136,7 +192,9 @@ function RightPanel() {
             <div className="w-8 h-8 flex items-center justify-center">
               <Heart className="w-6 h-6 text-rose-500 fill-rose-400 group-hover:scale-110 transition-transform" />
             </div>
-            <span className="text-sm font-extrabold tracking-tight text-rose-500">{hearts}</span>
+            <span className="text-sm font-extrabold tracking-tight text-rose-500">
+              {hearts}
+            </span>
           </button>
 
           {/* Shop */}
@@ -162,7 +220,8 @@ function RightPanel() {
                 Nâng cấp trải nghiệm học
               </p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Không giới hạn bài học, lộ trình cá nhân hóa và luyện tập nâng cao!
+                Không giới hạn bài học, lộ trình cá nhân hóa và luyện tập nâng
+                cao!
               </p>
             </div>
           </div>
@@ -174,17 +233,22 @@ function RightPanel() {
         {/* Leaderboard unlock card */}
         <div className="rounded-2xl border bg-card p-4 space-y-3">
           <p className="font-bold text-sm text-foreground">
-            {lessonsToLeaderboard > 0 ? "Mở khóa bảng xếp hạng!" : "Bảng xếp hạng đã mở!"}
+            {lessonsToLeaderboard > 0
+              ? "Mở khóa bảng xếp hạng!"
+              : "Bảng xếp hạng đã mở!"}
           </p>
           <div className="flex items-center gap-3">
-            <div className={cn(
-              "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
-              lessonsToLeaderboard > 0 ? "bg-muted" : "bg-yellow-100",
-            )}>
-              {lessonsToLeaderboard > 0
-                ? <Lock className="w-6 h-6 text-muted-foreground" />
-                : <Medal className="w-6 h-6 text-yellow-600" />
-              }
+            <div
+              className={cn(
+                "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
+                lessonsToLeaderboard > 0 ? "bg-muted" : "bg-yellow-100",
+              )}
+            >
+              {lessonsToLeaderboard > 0 ? (
+                <Lock className="w-6 h-6 text-muted-foreground" />
+              ) : (
+                <Medal className="w-6 h-6 text-yellow-600" />
+              )}
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {lessonsToLeaderboard > 0
@@ -202,7 +266,9 @@ function RightPanel() {
         {/* Daily quests */}
         <div className="rounded-2xl border bg-card p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-bold text-sm text-foreground">Nhiệm vụ hàng ngày</p>
+            <p className="font-bold text-sm text-foreground">
+              Nhiệm vụ hàng ngày
+            </p>
             <Link href="/progress">
               <button className="text-xs font-bold text-sky-500 hover:underline uppercase tracking-wide">
                 Xem tất cả
@@ -247,7 +313,9 @@ function RightPanel() {
                 <BookOpen className="w-5 h-5 text-blue-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-foreground">Hoàn thành 1 bài học</p>
+                <p className="text-xs font-semibold text-foreground">
+                  Hoàn thành 1 bài học
+                </p>
                 <div className="flex items-center gap-2 mt-1.5">
                   <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
                     <div
@@ -274,7 +342,6 @@ function RightPanel() {
             </button>
           </Link>
         </div>
-
       </div>
     </aside>
   );
@@ -296,14 +363,17 @@ export function AppLayout({
   const navItems = [
     { href: "/dashboard", icon: Home, label: "Trang chủ" },
     { href: "/roadmap", icon: Map, label: "Lộ Trình" },
-    { href: "/learn/1", icon: BookOpen, label: "Học tập" },
+    { href: "/learn", icon: BookOpen, label: "Học tập" },
     { href: "/progress", icon: BarChart2, label: "Tiến độ" },
     { href: "/leaderboard", icon: Medal, label: "Xếp hạng" },
   ];
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row">
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+      />
 
       {!hideNav && (
         <>
@@ -311,43 +381,64 @@ export function AppLayout({
           <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background z-30 px-4 py-2 flex justify-between items-center">
             {navItems.map((item) => {
               const isActive = location.startsWith(
-                item.href.split("/")[1] ? `/${item.href.split("/")[1]}` : item.href,
+                item.href.split("/")[1]
+                  ? `/${item.href.split("/")[1]}`
+                  : item.href,
               );
               return (
-                <Link key={item.href} href={item.href} className="flex flex-col items-center gap-0.5 group">
-                  <div className={cn(
-                    "p-2 rounded-full transition-colors",
-                    isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground group-hover:bg-muted",
-                  )}>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex flex-col items-center gap-0.5 group"
+                >
+                  <div
+                    className={cn(
+                      "p-2 rounded-full transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground group-hover:bg-muted",
+                    )}
+                  >
                     <item.icon className="w-5 h-5" />
                   </div>
-                  <span className={cn(
-                    "text-[9px] font-medium transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground",
-                  )}>
+                  <span
+                    className={cn(
+                      "text-[9px] font-medium transition-colors",
+                      isActive ? "text-primary" : "text-muted-foreground",
+                    )}
+                  >
                     {item.label}
                   </span>
                 </Link>
               );
             })}
-            <button onClick={() => setSettingsOpen(true)} className="flex flex-col items-center gap-0.5 group">
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="flex flex-col items-center gap-0.5 group"
+            >
               <div className="p-2 rounded-full text-muted-foreground group-hover:bg-muted transition-colors">
                 <Settings className="w-5 h-5" />
               </div>
-              <span className="text-[9px] font-medium text-muted-foreground">Cài đặt</span>
+              <span className="text-[9px] font-medium text-muted-foreground">
+                Cài đặt
+              </span>
             </button>
           </nav>
 
           {/* Desktop Left Sidebar */}
-          <aside className={cn(
-            "hidden md:flex flex-col border-r bg-card h-screen sticky top-0 transition-all duration-300 ease-in-out flex-shrink-0",
-            collapsed ? "w-16" : "w-64",
-          )}>
+          <aside
+            className={cn(
+              "hidden md:flex flex-col border-r bg-card h-screen sticky top-0 transition-all duration-300 ease-in-out flex-shrink-0",
+              collapsed ? "w-16" : "w-64",
+            )}
+          >
             {/* Logo + toggle */}
-            <div className={cn(
-              "flex items-center border-b h-16 flex-shrink-0",
-              collapsed ? "justify-center px-0" : "justify-between px-5",
-            )}>
+            <div
+              className={cn(
+                "flex items-center border-b h-16 flex-shrink-0",
+                collapsed ? "justify-center px-0" : "justify-between px-5",
+              )}
+            >
               {collapsed ? (
                 <button
                   onClick={() => setCollapsed(false)}
@@ -362,7 +453,9 @@ export function AppLayout({
                     <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl flex-shrink-0">
                       汉
                     </div>
-                    <span className="font-bold text-lg tracking-tight whitespace-nowrap">HSK Smart</span>
+                    <span className="font-bold text-lg tracking-tight whitespace-nowrap">
+                      HSK Smart
+                    </span>
                   </Link>
                   <button
                     onClick={() => setCollapsed(true)}
@@ -375,10 +468,17 @@ export function AppLayout({
             </div>
 
             {/* Nav items */}
-            <nav className={cn("flex-1 py-4 flex flex-col gap-1", collapsed ? "px-2" : "px-3")}>
+            <nav
+              className={cn(
+                "flex-1 py-4 flex flex-col gap-1",
+                collapsed ? "px-2" : "px-3",
+              )}
+            >
               {navItems.map((item) => {
                 const isActive = location.startsWith(
-                  item.href.split("/")[1] ? `/${item.href.split("/")[1]}` : item.href,
+                  item.href.split("/")[1]
+                    ? `/${item.href.split("/")[1]}`
+                    : item.href,
                 );
                 return (
                   <Link
@@ -419,17 +519,16 @@ export function AppLayout({
             </div>
 
             {/* User + XP section */}
-            <div className={cn("border-t space-y-3", collapsed ? "p-2" : "p-4")}>
+            <div
+              className={cn("border-t space-y-3", collapsed ? "p-2" : "p-4")}
+            >
               {collapsed ? (
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center" title="Học viên">
+                  <div
+                    className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center"
+                    title="Học viên"
+                  >
                     <User className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="w-full bg-primary/10 rounded-full overflow-hidden h-1.5" title={`${stats?.levelProgressPercent ?? 0}%`}>
-                    <div className="h-full bg-primary transition-all duration-500" style={{ width: `${stats?.levelProgressPercent ?? 0}%` }} />
-                  </div>
-                  <div title={`${stats?.totalXp ?? 0} XP`}>
-                    <Trophy className="w-3.5 h-3.5 text-yellow-500" />
                   </div>
                 </div>
               ) : (
@@ -441,7 +540,8 @@ export function AppLayout({
                     <div className="flex-1 overflow-hidden">
                       <p className="text-sm font-semibold truncate">Học viên</p>
                       <p className="text-xs text-muted-foreground">
-                        HSK {stats?.currentLevel ?? "—"} → HSK {stats?.targetLevel ?? "—"}
+                        HSK {stats?.currentLevel ?? "—"} → HSK{" "}
+                        {stats?.targetLevel ?? "—"}
                       </p>
                     </div>
                   </div>
@@ -449,13 +549,21 @@ export function AppLayout({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                        <span className="text-xs font-semibold text-foreground">{stats?.totalXp ?? 0} XP</span>
+                        <span className="text-xs font-semibold text-foreground">
+                          {stats?.totalXp ?? 0} XP
+                        </span>
                       </div>
-                      <span className="text-[11px] font-bold text-primary">{stats?.levelProgressPercent ?? 0}%</span>
+                      <span className="text-[11px] font-bold text-primary">
+                        {stats?.levelProgressPercent ?? 0}%
+                      </span>
                     </div>
-                    <Progress value={stats?.levelProgressPercent ?? 0} className="h-1.5" />
+                    <Progress
+                      value={stats?.levelProgressPercent ?? 0}
+                      className="h-1.5"
+                    />
                     <p className="text-[10px] text-muted-foreground text-center">
-                      Tiến độ HSK {stats?.currentLevel ?? "—"} · Mục tiêu HSK {stats?.targetLevel ?? "—"}
+                      Tiến độ HSK {stats?.currentLevel ?? "—"} · Mục tiêu HSK{" "}
+                      {stats?.targetLevel ?? "—"}
                     </p>
                   </div>
                 </>
@@ -466,7 +574,9 @@ export function AppLayout({
       )}
 
       {/* Main content */}
-      <main className={cn("flex-1 w-full min-w-0", !hideNav && "pb-20 md:pb-0")}>
+      <main
+        className={cn("flex-1 w-full min-w-0", !hideNav && "pb-20 md:pb-0")}
+      >
         {children}
       </main>
 

@@ -2,10 +2,12 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { FloatingBackground } from "@/components/floating-background";
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing";
 import OnboardingPage from "@/pages/onboarding";
 import DashboardPage from "@/pages/dashboard";
+import LearnPage from "@/pages/learn";
 import LearnLevelPage from "@/pages/learn-level";
 import LessonPage from "@/pages/lesson";
 import CheckpointPage from "@/pages/checkpoint";
@@ -27,6 +29,7 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/learn" component={LearnPage} />
       <Route path="/learn/:level" component={LearnLevelPage} />
       <Route path="/lesson/:id" component={LessonPage} />
       <Route path="/checkpoint/:level" component={CheckpointPage} />
@@ -48,10 +51,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
+        <FloatingBackground />
+        <div style={{ position: "relative", zIndex: 1, minHeight: "100vh" }}>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </div>
       </TooltipProvider>
     </QueryClientProvider>
   );
