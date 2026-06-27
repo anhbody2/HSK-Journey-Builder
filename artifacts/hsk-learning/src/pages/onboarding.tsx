@@ -79,7 +79,9 @@ export default function OnboardingPage() {
     }
   }
 
-  async function handleFinish() {
+async function handleFinish() {
+    // TẠM THỜI TẮT GỌI API ĐỂ BYPASS LỖI 404
+    /*
     await completeOnboarding.mutateAsync({
       data: {
         name: name || "Học viên",
@@ -89,6 +91,15 @@ export default function OnboardingPage() {
         dailyGoalMinutes: dailyGoal,
       },
     });
+    */
+
+    // Fake data vào localStorage lỡ các component khác ở Mainpage/Dashboard cần gọi ra dùng
+    localStorage.setItem("hsk_onboarding_completed", "true");
+    localStorage.setItem("hsk_user_name", name || "Học viên");
+    localStorage.setItem("hsk_target_level", selectedTarget.toString());
+    localStorage.setItem("hsk_daily_goal", dailyGoal.toString());
+
+    // Ép chuyển thẳng sang trang chính
     setLocation("/dashboard");
   }
 

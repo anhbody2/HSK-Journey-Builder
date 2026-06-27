@@ -20,7 +20,7 @@ import SettingsAppearancePage from "@/pages/settings-appearance";
 import SettingsProfilePage from "@/pages/settings-profile";
 import SettingsHelpPage from "@/pages/settings-help";
 import SettingsFeedbackPage from "@/pages/settings-feedback";
-
+import AddLessonPage from './pages/add-lesson';
 const queryClient = new QueryClient();
 
 function Router() {
@@ -42,6 +42,7 @@ function Router() {
       <Route path="/settings/profile" component={SettingsProfilePage} />
       <Route path="/settings/help" component={SettingsHelpPage} />
       <Route path="/settings/feedback" component={SettingsFeedbackPage} />
+      <Route path="/add-lesson" component={AddLessonPage} />
       <Route component={NotFound} />
     </Switch>
   );

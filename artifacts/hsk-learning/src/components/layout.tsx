@@ -342,7 +342,7 @@ function RightPanel() {
             </button>
           </Link>
         </div>
-      </div>
+      </div>s
     </aside>
   );
 }
@@ -366,6 +366,7 @@ export function AppLayout({
     { href: "/learn", icon: BookOpen, label: "Học tập" },
     { href: "/progress", icon: BarChart2, label: "Tiến độ" },
     { href: "/leaderboard", icon: Medal, label: "Xếp hạng" },
+    { href: "/add-lesson", icon: BookOpen, label: "Thêm bài học" },
   ];
 
   return (
