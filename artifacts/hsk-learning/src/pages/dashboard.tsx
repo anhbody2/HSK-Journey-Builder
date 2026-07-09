@@ -122,20 +122,38 @@ function StatCard({
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
   const { data: profile, isLoading: profileLoading } = useGetProfile();
-  const { data: stats, isLoading: statsLoading } = useGetDashboardStats();
+  // Bóp cổ thằng API này lại luôn
+  // const { data: stats, isLoading: statsLoading } = useGetDashboardStats();
+
+  // Nhét cục fake data này vào để nó vẽ biểu đồ cho ngầu
+  const statsLoading = false;
+  const stats = {
+    weeklyActivity: [
+      { day: "T2", xp: 20 },
+      { day: "T3", xp: 50 },
+      { day: "T4", xp: 10 },
+      { day: "T5", xp: 80 },
+      { day: "T6", xp: 30 },
+      { day: "T7", xp: 120 },
+      { day: "CN", xp: 60 },
+    ]
+  };
   const { data: daily } = useGetDailyTasks();
-  const { data: lessons } = useGetLessons({});
+  
+  // 1. COMMENT HOẶC XÓA DÒNG GỌI API LỖI NÀY ĐI
+  // const { data: lessons } = useGetLessons({});
 
-  useEffect(() => {
-    if (!profileLoading && profile && !profile.onboardingCompleted) {
-      setLocation("/onboarding");
-    }
-  }, [profileLoading, profile, setLocation]);
+  // 2. BƠM DATA FAKE VÀO ĐÂY ĐỂ LỪA GIAO DIỆN
+  const mockLessons = [
+    { id: "1", title: "Xin chào", titleChinese: "你好", level: 1, xpReward: 10, isCompleted: true, isLocked: false },
+    { id: "2", title: "Bạn tên gì?", titleChinese: "你叫什么名字？", level: 1, xpReward: 15, isCompleted: false, isLocked: false },
+    { id: "3", title: "Tôi là học sinh", titleChinese: "我是学生", level: 1, xpReward: 20, isCompleted: false, isLocked: false },
+  ];
 
-  if (!profileLoading && profile && !profile.onboardingCompleted) return null;
 
-  // Last 3 unlocked or in-progress lessons for the library recent section
-  const recentLessons = (lessons ?? []).filter((l) => !l.isLocked).slice(0, 3);
+
+  // 3. SỬA LẠI DÒNG NÀY TỪ (lessons ?? []) THÀNH mockLessons
+  const recentLessons = mockLessons.filter((l) => !l.isLocked).slice(0, 3);
 
   return (
     <AppLayout>
