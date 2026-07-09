@@ -3,6 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { authMiddleware } from "./lib/auth-middleware";
 
 const app: Express = express();
 
@@ -28,6 +29,9 @@ app.use(
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Resolve authenticated user for every request
+app.use(authMiddleware);
 
 app.use("/api", router);
 

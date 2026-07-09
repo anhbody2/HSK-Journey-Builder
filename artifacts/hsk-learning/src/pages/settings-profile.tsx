@@ -1,8 +1,9 @@
 import { AppLayout } from "@/components/layout";
-import { Link } from "wouter";
-import { ChevronLeft, User, Target, Clock, Save } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { ChevronLeft, User, Target, Clock, Save, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useGetProfile, useUpdateProfile } from "@workspace/api-client-react";
+import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 
 const HSK_LEVELS = [1, 2, 3, 4, 5];
@@ -16,12 +17,15 @@ const GOAL_OPTIONS = [
 ];
 
 export default function SettingsProfilePage() {
+  const [, setLocation] = useLocation();
   const { data: profile } = useGetProfile();
   const { mutate: updateProfile, isPending, isSuccess } = useUpdateProfile();
+  const { signOut, user } = useAuth();
 
   const [name, setName] = useState(profile?.name ?? "");
   const [targetLevel, setTargetLevel] = useState(profile?.targetLevel ?? 3);
   const [dailyGoal, setDailyGoal] = useState(profile?.dailyGoalMinutes ?? 15);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleSave = () => {
     updateProfile({
@@ -29,6 +33,12 @@ export default function SettingsProfilePage() {
       targetLevel,
       dailyGoalMinutes: dailyGoal,
     });
+  };
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await signOut();
+    setLocation("/");
   };
 
   return (
@@ -132,6 +142,21 @@ export default function SettingsProfilePage() {
             <Save className="w-4 h-4" />
             {isPending ? "Đang lưu..." : isSuccess ? "Đã lưu!" : "Lưu thay đổi"}
           </button>
+
+          {/* Log out button */}
+          {user && (
+            <button
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm border border-destructive/40 text-destructive hover:bg-destructive/10 active:scale-95 transition-all",
+                loggingOut && "opacity-60 cursor-not-allowed",
+              )}
+            >
+              <LogOut className="w-4 h-4" />
+              {loggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+            </button>
+          )}
         </div>
       </div>
     </AppLayout>
