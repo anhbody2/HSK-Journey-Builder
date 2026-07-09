@@ -1,24 +1,33 @@
-import { pgTable, serial, text, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { unitsTable } from "./units";
 
 export const lessonsTable = pgTable("lessons", {
   id: serial("id").primaryKey(),
-  level: integer("level").notNull(),
-  unit: integer("unit").notNull(),
-  lessonNumber: integer("lesson_number").notNull(),
-  title: text("title").notNull(),
-  titleChinese: text("title_chinese").notNull(),
-  type: text("type").notNull().default("dialogue"),
+  unitId: integer("unit_id").notNull().references(() => unitsTable.id),
+  title: varchar("title", { length: 255 }).notNull(),
   xpReward: integer("xp_reward").notNull().default(50),
-  estimatedMinutes: integer("estimated_minutes").notNull().default(10),
-  dialogue: jsonb("dialogue").notNull().default([]),
-  vocabulary: jsonb("vocabulary").notNull().default([]),
-  grammarPoints: jsonb("grammar_points").notNull().default([]),
-  shadowingText: text("shadowing_text").notNull().default(""),
-  shadowingPinyin: text("shadowing_pinyin").notNull().default(""),
+  orderIndex: integer("order_index").notNull().default(0),
+  lessonRequirement: integer("lesson_requirement").notNull().default(0),
+  exerciseRequirement: integer("exercise_requirement").notNull().default(0),
+});
+
+export const grammarTable = pgTable("grammar", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull().default(""),
+});
+
+export const lessonGrammarTable = pgTable("lesson_grammar", {
+  lessonId: integer("lesson_id").notNull().references(() => lessonsTable.id),
+  grammarId: integer("grammar_id").notNull().references(() => grammarTable.id),
 });
 
 export const insertLessonSchema = createInsertSchema(lessonsTable).omit({ id: true });
 export type InsertLesson = z.infer<typeof insertLessonSchema>;
 export type Lesson = typeof lessonsTable.$inferSelect;
+
+export const insertGrammarSchema = createInsertSchema(grammarTable).omit({ id: true });
+export type InsertGrammar = z.infer<typeof insertGrammarSchema>;
+export type Grammar = typeof grammarTable.$inferSelect;

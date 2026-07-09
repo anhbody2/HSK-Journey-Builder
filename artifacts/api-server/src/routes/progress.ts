@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db, lessonProgressTable, dailyActivityTable, usersTable, lessonsTable } from "@workspace/db";
-import { eq, and, desc, count } from "drizzle-orm";
+import { supabase } from "../lib/supabase";
+import { uid } from "../lib/auth-middleware";
 import { UpdateLessonProgressBody, UpdateLessonProgressParams } from "@workspace/api-zod";
 import { getMockDashboardStats, MOCK_USER, MOCK_COMPLETED_IDS } from "../lib/mock-data";
 
@@ -8,119 +8,59 @@ const router = Router();
 
 router.get("/progress", async (req, res) => {
   try {
-    const user = await db.select().from(usersTable).where(eq(usersTable.id, 1)).limit(1);
-    const u = user[0];
-    if (!u) return res.status(404).json({ error: "User not found" });
+    if (!supabase) throw new Error("No Supabase client");
+    const userId = uid(req);
+    const { data: userRows, error: uErr } = await supabase.from("users").select("*").eq("id", userId).limit(1);
+    if (uErr) throw uErr;
+    const u = userRows?.[0];
+    if (!u) throw new Error("User not found");
 
-    const allProgress = await db.select().from(lessonProgressTable)
-      .where(and(eq(lessonProgressTable.userId, 1), eq(lessonProgressTable.step, "quiz"), eq(lessonProgressTable.isCompleted, true)));
+    const { data: completed } = await supabase.from("lesson_attempts")
+      .select("id").eq("user_id", userId).eq("is_completed", true);
+    const { count: totalLessons } = await supabase.from("lessons").select("*", { count: "exact", head: true });
 
-    const [{ totalLessons }] = await db.select({ totalLessons: count() }).from(lessonsTable)
-      .where(eq(lessonsTable.level, u.currentLevel));
-
-    const weeklyActivity = await db.select().from(dailyActivityTable)
-      .where(eq(dailyActivityTable.userId, 1))
-      .orderBy(desc(dailyActivityTable.date))
-      .limit(7);
-
-    const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-    const today = new Date();
-    const weeklyXp = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(today);
-      d.setDate(today.getDate() - (6 - i));
-      const dateStr = d.toISOString().split("T")[0];
-      const act = weeklyActivity.find(a => a.date === dateStr);
-      return { day: days[d.getDay()], xp: act?.xpEarned ?? 0 };
-    });
-
+    const total = totalLessons ?? 1;
+    const done = completed?.length ?? 0;
     res.json({
-      currentLevel: u.currentLevel,
-      currentUnit: 1,
-      completedLessons: allProgress.length,
-      totalLessons: totalLessons || 1,
-      levelProgressPercent: Math.min(100, Math.round((allProgress.length / Math.max(totalLessons, 1)) * 100)),
-      vocabularyLearned: allProgress.length * 8,
-      totalXp: u.totalXp,
-      weeklyXp,
+      currentLevel: u.current_level ?? 1, currentUnit: 1,
+      completedLessons: done, totalLessons: total,
+      levelProgressPercent: Math.min(100, Math.round((done / Math.max(total, 1)) * 100)),
+      vocabularyLearned: done * 8, totalXp: u.total_xp ?? 0, weeklyXp: [],
     });
   } catch {
     const stats = getMockDashboardStats();
-    const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-    const today = new Date();
-    const weeklyXp = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(today);
-      d.setDate(today.getDate() - (6 - i));
-      return { day: days[d.getDay()], xp: stats.weeklyActivity[i]?.xp ?? 0 };
-    });
     res.json({
-      currentLevel: MOCK_USER.currentLevel,
-      currentUnit: 1,
-      completedLessons: MOCK_COMPLETED_IDS.size,
-      totalLessons: 8,
+      currentLevel: MOCK_USER.currentLevel, currentUnit: 1,
+      completedLessons: MOCK_COMPLETED_IDS.size, totalLessons: 8,
       levelProgressPercent: Math.round((MOCK_COMPLETED_IDS.size / 8) * 100),
-      vocabularyLearned: MOCK_COMPLETED_IDS.size * 8,
-      totalXp: MOCK_USER.totalXp,
-      weeklyXp,
+      vocabularyLearned: MOCK_COMPLETED_IDS.size * 8, totalXp: MOCK_USER.totalXp,
+      weeklyXp: stats.weeklyActivity.map(w => ({ day: w.day, xp: w.xp })),
     });
   }
 });
 
 router.post("/progress/lessons/:lessonId", async (req, res) => {
   try {
+    if (!supabase) throw new Error("No Supabase client");
+    const userId = uid(req);
     const params = UpdateLessonProgressParams.parse(req.params);
     const body = UpdateLessonProgressBody.parse(req.body);
-    const lessonId = params.lessonId;
 
-    const existing = await db.select().from(lessonProgressTable)
-      .where(and(
-        eq(lessonProgressTable.userId, 1),
-        eq(lessonProgressTable.lessonId, lessonId),
-        eq(lessonProgressTable.step, body.step)
-      )).limit(1);
+    const { data: attempt, error } = await supabase.from("lesson_attempts")
+      .insert({ user_id: userId, lesson_id: params.lessonId, is_completed: body.isCompleted })
+      .select().single();
+    if (error) throw error;
 
-    let result;
-    if (existing.length > 0) {
-      [result] = await db.update(lessonProgressTable)
-        .set({
-          isCompleted: body.isCompleted,
-          score: body.score ?? null,
-          completedAt: body.isCompleted ? new Date() : null,
-        })
-        .where(eq(lessonProgressTable.id, existing[0].id))
-        .returning();
-    } else {
-      [result] = await db.insert(lessonProgressTable).values({
-        userId: 1,
-        lessonId,
-        step: body.step,
-        isCompleted: body.isCompleted,
-        score: body.score ?? null,
-        completedAt: body.isCompleted ? new Date() : null,
-      }).returning();
-    }
-
-    if (body.isCompleted && body.step === "quiz") {
-      const today = new Date().toISOString().split("T")[0];
-      const xpGain = 50;
-      const existing2 = await db.select().from(dailyActivityTable)
-        .where(and(eq(dailyActivityTable.userId, 1), eq(dailyActivityTable.date, today))).limit(1);
-      if (existing2.length > 0) {
-        await db.update(dailyActivityTable)
-          .set({ xpEarned: existing2[0].xpEarned + xpGain, minutesStudied: existing2[0].minutesStudied + 10 })
-          .where(eq(dailyActivityTable.id, existing2[0].id));
-      } else {
-        await db.insert(dailyActivityTable).values({ userId: 1, date: today, xpEarned: xpGain, minutesStudied: 10 });
-      }
-      const [u2] = await db.select().from(usersTable).where(eq(usersTable.id, 1)).limit(1);
-      await db.update(usersTable).set({ totalXp: u2.totalXp + xpGain }).where(eq(usersTable.id, 1));
+    if (body.isCompleted) {
+      const { data: userRows } = await supabase.from("users").select("total_xp").eq("id", userId).limit(1);
+      const currentXp = userRows?.[0]?.total_xp ?? 0;
+      await supabase.from("users").update({ total_xp: currentXp + 50 }).eq("id", userId);
     }
 
     res.json({
-      lessonId,
-      step: result.step,
-      isCompleted: result.isCompleted,
-      score: result.score ?? null,
-      completedAt: result.completedAt?.toISOString() ?? null,
+      lessonId: params.lessonId, step: body.step,
+      isCompleted: attempt.is_completed, score: null,
+      completedAt: attempt.created_at ?? null,
     });
   } catch {
     const params = UpdateLessonProgressParams.safeParse(req.params);
@@ -129,75 +69,54 @@ router.post("/progress/lessons/:lessonId", async (req, res) => {
       lessonId: params.success ? params.data.lessonId : 0,
       step: body.success ? body.data.step : "quiz",
       isCompleted: body.success ? body.data.isCompleted : false,
-      score: null,
-      completedAt: null,
+      score: null, completedAt: null,
     });
   }
 });
 
 router.get("/progress/streak", async (req, res) => {
   try {
-    const user = await db.select().from(usersTable).where(eq(usersTable.id, 1)).limit(1);
-    const u = user[0];
-    if (!u) return res.status(404).json({ error: "User not found" });
-
+    if (!supabase) throw new Error("No Supabase client");
+    const userId = uid(req);
+    const { data: userRows, error } = await supabase.from("users").select("*").eq("id", userId).limit(1);
+    if (error) throw error;
+    const u = userRows?.[0];
+    if (!u) throw new Error("User not found");
     const today = new Date().toISOString().split("T")[0];
-    const studiedToday = u.lastStudyDate === today;
-
     res.json({
-      currentStreak: u.currentStreak,
-      longestStreak: u.longestStreak,
-      lastStudyDate: u.lastStudyDate ?? null,
-      studiedToday,
+      currentStreak: u.current_streak ?? 0, longestStreak: 0,
+      lastStudyDate: u.last_active_date ?? null,
+      studiedToday: u.last_active_date === today,
     });
   } catch {
     res.json({
-      currentStreak: MOCK_USER.currentStreak,
-      longestStreak: MOCK_USER.longestStreak,
-      lastStudyDate: MOCK_USER.lastStudyDate,
-      studiedToday: true,
+      currentStreak: MOCK_USER.currentStreak, longestStreak: MOCK_USER.longestStreak,
+      lastStudyDate: MOCK_USER.lastStudyDate, studiedToday: true,
     });
   }
 });
 
 router.get("/stats/dashboard", async (req, res) => {
   try {
-    const user = await db.select().from(usersTable).where(eq(usersTable.id, 1)).limit(1);
-    const u = user[0];
-    if (!u) return res.status(404).json({ error: "User not found" });
+    if (!supabase) throw new Error("No Supabase client");
+    const userId = uid(req);
+    const { data: userRows, error } = await supabase.from("users").select("*").eq("id", userId).limit(1);
+    if (error) throw error;
+    const u = userRows?.[0];
+    if (!u) throw new Error("User not found");
 
-    const allProgress = await db.select().from(lessonProgressTable)
-      .where(and(eq(lessonProgressTable.userId, 1), eq(lessonProgressTable.step, "quiz"), eq(lessonProgressTable.isCompleted, true)));
-
-    const weeklyActivity = await db.select().from(dailyActivityTable)
-      .where(eq(dailyActivityTable.userId, 1))
-      .orderBy(desc(dailyActivityTable.date))
-      .limit(7);
-
-    const today = new Date().toISOString().split("T")[0];
-    const todayActivity = weeklyActivity.find(a => a.date === today);
-
-    const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-    const todayDate = new Date();
-    const weeklyData = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(todayDate);
-      d.setDate(todayDate.getDate() - (6 - i));
-      const dateStr = d.toISOString().split("T")[0];
-      const act = weeklyActivity.find(a => a.date === dateStr);
-      return { day: days[d.getDay()], xp: act?.xpEarned ?? 0, minutes: act?.minutesStudied ?? 0 };
-    });
+    const { data: completed } = await supabase.from("lesson_attempts")
+      .select("id").eq("user_id", userId).eq("is_completed", true);
+    const done = completed?.length ?? 0;
 
     res.json({
-      totalXp: u.totalXp,
-      currentLevel: u.currentLevel,
-      targetLevel: u.targetLevel,
-      levelProgressPercent: Math.min(100, Math.round((allProgress.length / 6) * 100)),
-      vocabularyLearned: allProgress.length * 8,
-      completedLessons: allProgress.length,
-      currentStreak: u.currentStreak,
-      todayMinutes: todayActivity?.minutesStudied ?? 0,
-      dailyGoalMinutes: u.dailyGoalMinutes,
-      weeklyActivity: weeklyData,
+      totalXp: u.total_xp ?? 0,
+      currentLevel: u.current_level ?? 1,
+      targetLevel: u.target_level ?? 4,
+      levelProgressPercent: Math.min(100, Math.round((done / 8) * 100)),
+      vocabularyLearned: done * 8, completedLessons: done,
+      currentStreak: u.current_streak ?? 0,
+      todayMinutes: 10, dailyGoalMinutes: u.daily_goal ?? 15, weeklyActivity: [],
     });
   } catch {
     res.json(getMockDashboardStats());

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useCompleteOnboarding } from "@workspace/api-client-react";
 import { ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,8 +63,6 @@ export default function OnboardingPage() {
   const [currentQ, setCurrentQ] = useState(0);
   const [selectedTarget, setSelectedTarget] = useState(3);
   const [dailyGoal, setDailyGoal] = useState(15);
-  const completeOnboarding = useCompleteOnboarding();
-
   const correctCount = quizAnswers.filter((a, i) => a === PLACEMENT_QUESTIONS[i]?.correct).length;
   const recommendedLevel = correctCount <= 1 ? 1 : correctCount <= 3 ? 2 : 3;
 
@@ -79,28 +76,17 @@ export default function OnboardingPage() {
     }
   }
 
-async function handleFinish() {
-    // TẠM THỜI TẮT GỌI API ĐỂ BYPASS LỖI 404
-    /*
-    await completeOnboarding.mutateAsync({
-      data: {
-        name: name || "Học viên",
-        targetLevel: selectedTarget,
-        placementScore: correctCount,
-        recommendedLevel,
-        dailyGoalMinutes: dailyGoal,
-      },
-    });
-    */
-
-    // Fake data vào localStorage lỡ các component khác ở Mainpage/Dashboard cần gọi ra dùng
-    localStorage.setItem("hsk_onboarding_completed", "true");
-    localStorage.setItem("hsk_user_name", name || "Học viên");
-    localStorage.setItem("hsk_target_level", selectedTarget.toString());
-    localStorage.setItem("hsk_daily_goal", dailyGoal.toString());
-
-    // Ép chuyển thẳng sang trang chính
-    setLocation("/dashboard");
+  function handleFinish() {
+    // Save quiz data for the auth page to pick up after sign-up
+    sessionStorage.setItem("onboarding_data", JSON.stringify({
+      name: name || "Học viên",
+      targetLevel: selectedTarget,
+      recommendedLevel,
+      dailyGoalMinutes: dailyGoal,
+      placementScore: correctCount,
+      totalQuestions: PLACEMENT_QUESTIONS.length,
+    }));
+    setLocation("/auth");
   }
 
   const steps: Step[] = ["welcome", "quiz", "name", "goal", "level", "result"];
@@ -141,6 +127,13 @@ async function handleFinish() {
               <Button size="lg" className="w-full h-14 text-base rounded-xl" onClick={() => setStep("quiz")}>
                 Bắt đầu đánh giá <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
+              <button
+                type="button"
+                onClick={() => setStep("name")}
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+              >
+                Bỏ qua bài kiểm tra →
+              </button>
             </div>
           )}
 
@@ -283,9 +276,7 @@ async function handleFinish() {
                 ))}
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 h-12 rounded-xl" onClick={() => setStep("goal")}>
-                  <ArrowLeft className="mr-2 w-4 h-4" /> Quay lại
-                </Button>
+                
                 <Button className="flex-1 h-12 rounded-xl" onClick={() => setStep("result")}>
                   Xem kết quả <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
@@ -325,10 +316,9 @@ async function handleFinish() {
                 size="lg"
                 className="w-full h-14 text-base rounded-xl"
                 onClick={handleFinish}
-                disabled={completeOnboarding.isPending}
                 data-testid="button-start-learning"
               >
-                {completeOnboarding.isPending ? "Đang xử lý..." : "Bắt đầu học ngay"} <ArrowRight className="ml-2 w-5 h-5" />
+                Bắt đầu học ngay <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </div>
           )}

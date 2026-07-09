@@ -1,20 +1,32 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-export default defineConfig(({ mode }) => {
-  // 1. Manually load the local .env file inside artifacts/hsk-learning
-  const loadedEnv = loadEnv(mode, path.resolve(import.meta.dirname), "");
+export default defineConfig(async ({ mode }): Promise<UserConfig> => {
+  const env = loadEnv(mode, process.cwd(), '');
 
-  // 2. Extract values or fall back to sensible defaults for local development
-  const rawPort = loadedEnv.PORT || "3000";
-  const basePath = loadedEnv.BASE_PATH || "/";
+  const rawPort = env.PORT;
+
+  if (!rawPort) {
+    throw new Error(
+      "PORT environment variable is required but was not provided.",
+    );
+  }
 
   const port = Number(rawPort);
+
   if (Number.isNaN(port) || port <= 0) {
     throw new Error(`Invalid PORT value: "${rawPort}"`);
+  }
+
+  const basePath = env.BASE_PATH;
+
+  if (!basePath) {
+    throw new Error(
+      "BASE_PATH environment variable is required but was not provided.",
+    );
   }
 
   return {
@@ -23,15 +35,15 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       runtimeErrorOverlay(),
-      // This checks if we are actually running on Replit before trying to load Replit-only tools
-      ...(process.env.NODE_ENV !== "production" && process.env.REPL_ID !== undefined
+      ...(process.env.NODE_ENV !== "production" &&
+      process.env.REPL_ID !== undefined
         ? [
-            import("@replit/vite-plugin-cartographer").then((m) =>
+            await import("@replit/vite-plugin-cartographer").then((m) =>
               m.cartographer({
                 root: path.resolve(import.meta.dirname, ".."),
               }),
             ),
-            import("@replit/vite-plugin-dev-banner").then((m) =>
+            await import("@replit/vite-plugin-dev-banner").then((m) =>
               m.devBanner(),
             ),
           ]

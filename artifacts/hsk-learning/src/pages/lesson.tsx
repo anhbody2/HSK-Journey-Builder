@@ -134,9 +134,9 @@ export default function LessonPage() {
     );
   }
 
-  const dialogue = lesson.dialogue as any[];
-  const vocabulary = lesson.vocabulary as any[];
-  const grammarPoints = lesson.grammarPoints as any[];
+  const dialogue = (lesson.dialogue as any[]) ?? [];
+  const vocabulary = (lesson.vocabulary as any[]) ?? [];
+  const grammarPoints = (lesson.grammarPoints as any[]) ?? [];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
