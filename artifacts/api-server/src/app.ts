@@ -27,12 +27,17 @@ app.use(
     },
   }),
 );
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173"];
+
+// 👇 ADD THIS TEMPORARILY TO DEBUG:
+console.log("Current Environment ALLOWED_ORIGINS parsed as:", allowedOrigins);
+
 app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS 
-      ? process.env.ALLOWED_ORIGINS.split(",") 
-      : ["http://localhost:5173"],
+    origin: allowedOrigins,
     credentials: true,
-  }));
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
