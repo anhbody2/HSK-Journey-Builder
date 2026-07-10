@@ -32,7 +32,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ["http://localhost:5173"];
 
 // 👇 ADD THIS TEMPORARILY TO DEBUG:
-console.log("Current Environment ALLOWED_ORIGINS parsed as:", allowedOrigins);
+console.log("Current Environment ALLOWED_ORIGINS parsed as2:", allowedOrigins);
 
 app.use(cors({
     origin: allowedOrigins,
