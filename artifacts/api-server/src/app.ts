@@ -1,4 +1,5 @@
 import express, { type Express } from "express";
+import "dotenv/config";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -29,7 +30,7 @@ app.use(
 app.use(cors({
     origin: process.env.ALLOWED_ORIGINS 
       ? process.env.ALLOWED_ORIGINS.split(",") 
-      : "http://localhost:5173",
+      : ["http://localhost:5173"],
     credentials: true,
   }));
 app.use(express.json());
