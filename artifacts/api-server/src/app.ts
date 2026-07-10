@@ -1,4 +1,5 @@
 import express, { type Express } from "express";
+import "dotenv/config";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -26,6 +27,7 @@ app.use(
     },
   }),
 );
+<<<<<<< HEAD
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS 
@@ -34,6 +36,19 @@ app.use(
     credentials: true,
   })
 );
+=======
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173"];
+
+// 👇 ADD THIS TEMPORARILY TO DEBUG:
+console.log("Current Environment ALLOWED_ORIGINS parsed as:", allowedOrigins);
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true,
+}));
+>>>>>>> f813b4b0fe736b5b722d43a3d97757328e064e9d
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
