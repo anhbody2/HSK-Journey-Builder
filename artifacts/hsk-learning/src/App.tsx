@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { FloatingBackground } from "@/components/floating-background";
 import { AuthProvider } from "@/context/auth-context";
 import { useEffect } from "react";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
 import { supabase } from "@/lib/supabase";
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing";
@@ -27,7 +27,7 @@ import SettingsHelpPage from "@/pages/settings-help";
 import SettingsFeedbackPage from "@/pages/settings-feedback";
 import AddLessonPage from './pages/add-lesson';
 const queryClient = new QueryClient();
-
+setBaseUrl(import.meta.env.VITE_API_URL ?? null);
 /** Registers the Supabase session token so every API call carries it. */
 function AuthTokenBridge() {
   useEffect(() => {
